@@ -23,8 +23,122 @@ import {
   Typography,
   Divider,
   Avatar,
+  styled
 } from "@mui/material";
 import logo from "../assets/logo.png";
+
+// Cyberpunk color palette
+const colors = {
+  deepSpace: '#0a0e17',
+  cosmicPurple: '#1a1a2e',
+  nebulaBlue: '#16213e',
+  cyberViolet: '#4a148c',
+  matrixGreen: '#00ff9d',
+  electricBlue: '#00d1ff',
+  plasmaPink: '#ff00aa',
+  starlight: '#e6f1ff',
+  cosmicDust: '#7f8c8d',
+  voidBlack: '#000000',
+  hackerGreen: '#39ff14'
+};
+
+// CyberGlass effect for the drawer
+const CyberDrawer = styled(Drawer)({
+  '& .MuiDrawer-paper': {
+    background: 'rgba(10, 14, 23, 0.85)',
+    borderRight: `1px solid ${colors.matrixGreen}30`,
+    boxShadow: `0 0 30px ${colors.matrixGreen}20`,
+    backdropFilter: 'blur(10px)',
+    transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+    overflowX: 'hidden',
+    '&::before': {
+      content: '""',
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      background: `linear-gradient(135deg, ${colors.deepSpace} 0%, ${colors.cosmicPurple} 100%)`,
+      zIndex: -1,
+    }
+  }
+});
+
+// Cyberpunk styled components
+const CyberListItemButton = styled(ListItemButton)(({ selected }) => ({
+  minHeight: 48,
+  borderRadius: '8px',
+  margin: '8px 12px',
+  overflow: 'hidden',
+  position: 'relative',
+  transition: 'all 0.3s ease',
+  border: selected ? `1px solid ${colors.matrixGreen}` : `1px solid ${colors.matrixGreen}20`,
+  background: selected 
+    ? `linear-gradient(135deg, ${colors.matrixGreen}20 0%, ${colors.electricBlue}10 100%)` 
+    : 'transparent',
+  '&:hover': {
+    transform: 'translateY(-2px)',
+    boxShadow: `0 5px 15px ${colors.matrixGreen}30`,
+    background: `linear-gradient(135deg, ${colors.matrixGreen}10 0%, ${colors.electricBlue}05 100%)`,
+    '&::after': {
+      transform: 'translateX(0)'
+    }
+  },
+  '&::after': {
+    content: '""',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    background: `linear-gradient(90deg, transparent, ${colors.matrixGreen}15, transparent)`,
+    transform: 'translateX(-100%)',
+    transition: 'transform 0.6s ease'
+  },
+  '& .MuiListItemIcon-root': {
+    color: selected ? colors.matrixGreen : colors.starlight,
+    minWidth: '36px'
+  },
+  '& .MuiListItemText-primary': {
+    fontWeight: selected ? 'bold' : 'normal',
+    color: selected ? colors.matrixGreen : colors.starlight,
+    letterSpacing: '0.05em'
+  }
+}));
+
+const CyberDivider = styled(Divider)({
+  background: `linear-gradient(90deg, transparent, ${colors.matrixGreen}50, transparent)`,
+  height: '1px',
+  border: 'none',
+  margin: '16px 0'
+});
+
+const CyberAvatar = styled(Avatar)({
+  border: `2px solid ${colors.matrixGreen}`,
+  boxShadow: `0 0 10px ${colors.matrixGreen}50`,
+  transition: 'all 0.3s ease',
+  '&:hover': {
+    transform: 'scale(1.1)',
+    boxShadow: `0 0 20px ${colors.matrixGreen}`
+  }
+});
+
+const CyberMenuButton = styled(IconButton)({
+  color: colors.matrixGreen,
+  transition: 'all 0.3s ease',
+  '&:hover': {
+    color: colors.electricBlue,
+    transform: 'rotate(90deg)'
+  }
+});
+
+const CyberLogo = styled('img')({
+  filter: 'drop-shadow(0 0 5px rgba(0, 255, 157, 0.7))',
+  transition: 'all 0.3s ease',
+  '&:hover': {
+    filter: 'drop-shadow(0 0 10px rgba(0, 255, 157, 1))'
+  }
+});
 
 const CybersecuritySidebar = ({ isExpanded, setIsExpanded }) => {
   const navigate = useNavigate();
@@ -35,11 +149,11 @@ const CybersecuritySidebar = ({ isExpanded, setIsExpanded }) => {
   const { name, username, email, picture } = user;
 
   const navItems = [
-    { icon: <HomeIcon />, label: "Home", route: "/dashboard" },
-    { icon: <SearchIcon />, label: "AI Threat Scanner", route: "/threat-scanner" },
-    { icon: <BookIcon />, label: "Cyber Safety Guide", route: "/safety-guide" },
-    { icon: <HelpCircleIcon />, label: "Emergency Help", route: "/emergency" },
-    { icon: <SettingsIcon />, label: "Settings & Profile", route: "/settings" },
+    { icon: <HomeIcon />, label: "Dashboard", route: "/dashboard" },
+    { icon: <SearchIcon />, label: "Threat Scanner", route: "/threat-scanner" },
+    { icon: <BookIcon />, label: "Cyber Guide", route: "/safety-guide" },
+    { icon: <HelpCircleIcon />, label: "Emergency", route: "/emergency" },
+    { icon: <SettingsIcon />, label: "Settings", route: "/settings" },
   ];
 
   const handleLogout = () => {
@@ -51,165 +165,167 @@ const CybersecuritySidebar = ({ isExpanded, setIsExpanded }) => {
   const getAvatarContent = () => {
     if (picture) return null;
     const displayName = username || name;
-    return displayName ? displayName.charAt(0).toUpperCase() : "G";
+    return displayName ? displayName.charAt(0).toUpperCase() : "U";
   };
 
   return (
-    <Drawer
+    <CyberDrawer
       variant="permanent"
       sx={{
-        width: isExpanded ? 260 : 80,
+        width: isExpanded ? 280 : 80,
         flexShrink: 0,
-        overflowX: "hidden",
-        transition: "width 0.3s",
-        "& .MuiDrawer-paper": {
-          width: isExpanded ? 260 : 80,
-          boxSizing: "border-box",
-          overflowX: "hidden",
-          backgroundColor: "#243447",
-          color: "#FFFFFF",
-          boxShadow: "4px 0 10px rgba(0,0,0,0.1)",
-          borderRight: "none",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
+        '& .MuiDrawer-paper': {
+          width: isExpanded ? 280 : 80,
+          boxSizing: 'border-box',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between'
         },
       }}
     >
       <Box>
-        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: '10px' }}>
+        <Box sx={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'space-between', 
+          p: 2,
+          borderBottom: `1px solid ${colors.matrixGreen}20`
+        }}>
           {isExpanded && (
-            <img
+            <CyberLogo
               src={logo}
               alt="logo"
-              style={{ borderRadius: '6px', margin: '15px' }}
-              width={150}
-              height={40}
+              style={{ borderRadius: '6px' }}
+              width={180}
+              height={45}
             />
           )}
-          <IconButton onClick={() => setIsExpanded(!isExpanded)}>
-            <MenuIcon sx={{ color: "white", fontSize: "60px", padding: 2 }} />
-          </IconButton>
+          <CyberMenuButton 
+            onClick={() => setIsExpanded(!isExpanded)}
+            size="large"
+          >
+            <MenuIcon sx={{ fontSize: "32px" }} />
+          </CyberMenuButton>
         </Box>
 
-        <List sx={{ paddingY: 1 }}>
+        <List sx={{ p: 2 }}>
           {navItems.map((item) => (
             <ListItem 
               key={item.route}
               disablePadding
               sx={{
                 display: 'block',
-                marginBottom: '12px',
-                borderRadius: '8px',
-                overflow: 'hidden'
+                mb: 1
               }}
             >
-              <ListItemButton
+              <CyberListItemButton
                 selected={location.pathname === item.route}
                 onClick={() => navigate(item.route)}
                 sx={{
-                  minHeight: 48,
                   justifyContent: isExpanded ? 'initial' : 'center',
-                  px: 2.5,
-                  py: 1.5,
-                  transition: 'all 0.3s ease',
-                  '&:hover': {
-                    backgroundColor: 'rgba(255,255,255,0.15)',
-                    transform: 'scale(1.02)'
-                  },
-                  '&.Mui-selected': {
-                    backgroundColor: '#36A2EB',
-                    color: 'white',
-                    '&:hover': {
-                      backgroundColor: '#36A2EB'
-                    }
-                  },
-                  '&.Mui-selected .MuiListItemIcon-root': {
-                    color: 'white'
-                  }
+                  px: isExpanded ? 3 : 2.5,
+                  py: 1.5
                 }}
               >
-                <ListItemIcon
-                  sx={{
-                    minWidth: 0,
-                    mr: isExpanded ? 3 : 'auto',
-                    justifyContent: 'center',
-                    color: 'inherit'
-                  }}
-                >
+                <ListItemIcon>
                   {item.icon}
                 </ListItemIcon>
                 {isExpanded && (
                   <ListItemText 
-                    primary={item.label} 
+                    primary={item.label}
                     primaryTypographyProps={{
-                      fontWeight: location.pathname === item.route ? 'bold' : 'normal'
+                      fontSize: '0.9rem'
                     }}
                   />
                 )}
-              </ListItemButton>
+              </CyberListItemButton>
             </ListItem>
           ))}
         </List>
       </Box>
 
-      {/* User Profile Footer with Logout */}
-      <Box>
-        <Divider sx={{ borderColor: "rgba(255,255,255,0.12)" }} />
-        <List>
-          <ListItem disablePadding>
-            <ListItemButton
-              onClick={handleLogout}
-              sx={{
-                py: 1.5,
-                px: 2.5,
-                '&:hover': {
-                  backgroundColor: 'rgba(255,255,255,0.15)'
-                }
-              }}
-            >
-              <ListItemIcon sx={{ minWidth: 0, mr: isExpanded ? 3 : 'auto' }}>
-                <LogoutIcon sx={{ color: 'white' }} />
-              </ListItemIcon>
-              {isExpanded && <ListItemText primary="Logout" />}
-            </ListItemButton>
-          </ListItem>
-        </List>
+      {/* User Profile Footer */}
+      <Box sx={{ p: 2 }}>
+        <CyberDivider />
 
-        {/* User Profile Footer */}
-        <Box sx={{ p: 2, borderTop: "1px solid rgba(255,255,255,0.12)" }}>
-          <ListItem sx={{ px: 0 }}>
+        {/* Logout Button */}
+        <ListItem disablePadding>
+          <CyberListItemButton
+            onClick={handleLogout}
+            sx={{
+              justifyContent: isExpanded ? 'initial' : 'center',
+              px: isExpanded ? 3 : 2.5,
+              py: 1.5,
+              mb: 2
+            }}
+          >
             <ListItemIcon>
-              {picture ? (
-                <Avatar src={picture} alt={name} sx={{ width: 40, height: 40 }} />
-              ) : (
-                <Avatar sx={{
-                  width: 40,
-                  height: 40,
-                  bgcolor: '#36A2EB',
-                  color: 'white'
-                }}>
-                  {getAvatarContent()}
-                </Avatar>
-              )}
+              <LogoutIcon />
             </ListItemIcon>
-            {isExpanded && (
-              <Box sx={{ ml: 1, overflow: "hidden" }}>
-                <Typography variant="subtitle1" noWrap>
-                  {username || name || "Guest User"}
-                </Typography>
-                <Box sx={{ display: "flex", alignItems: "center" }}>
-                  <EmailIcon sx={{ fontSize: 16, mr: 1 }} />
-                  <Typography variant="caption" noWrap>
-                    {email || "No email provided"}
-                  </Typography>
-                </Box>
-              </Box>
+            {isExpanded && <ListItemText primary="Logout" />}
+          </CyberListItemButton>
+        </ListItem>
+
+        {/* User Profile */}
+        <Box sx={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          p: 1,
+          borderRadius: '8px',
+          border: `1px solid ${colors.matrixGreen}20`,
+          background: `linear-gradient(135deg, ${colors.deepSpace} 0%, ${colors.cosmicPurple}30 100%)`,
+          '&:hover': {
+            boxShadow: `0 0 15px ${colors.matrixGreen}30`
+          }
+        }}>
+          <ListItemIcon>
+            {picture ? (
+              <CyberAvatar src={picture} alt={name} sx={{ width: 40, height: 40 }} />
+            ) : (
+              <CyberAvatar sx={{
+                width: 40,
+                height: 40,
+                bgcolor: colors.cyberViolet,
+                color: colors.starlight
+              }}>
+                {getAvatarContent()}
+              </CyberAvatar>
             )}
-          </ListItem>
+          </ListItemIcon>
+          {isExpanded && (
+            <Box sx={{ 
+              ml: 1, 
+              overflow: "hidden",
+              textOverflow: 'ellipsis'
+            }}>
+              <Typography 
+                variant="subtitle2" 
+                noWrap
+                sx={{
+                  color: colors.matrixGreen,
+                  fontWeight: 'bold'
+                }}
+              >
+                {username || name || "User"}
+              </Typography>
+              <Typography 
+                variant="caption" 
+                noWrap
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  color: colors.cosmicDust,
+                  fontSize: '0.7rem'
+                }}
+              >
+                <EmailIcon sx={{ fontSize: 14, mr: 0.5 }} />
+                {email || "no-email@domain.com"}
+              </Typography>
+            </Box>
+          )}
         </Box>
       </Box>
-    </Drawer>
+    </CyberDrawer>
   );
 };
 
