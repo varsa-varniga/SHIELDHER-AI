@@ -4,7 +4,7 @@ import {
     Navigate,
     useLocation,
   } from "react-router-dom";
-  // import CybersecuritySidebar from "./src/screens/sidebar";
+  import CybersecuritySidebar from "./src/screens/sidebar";
   import Dashboard from "./src/components/dashboard";
   import ThreatScanner from "./src/components/threatscanner";
   import CyberSafetyGuide from "./src/components/cybersecurity";
