@@ -27,14 +27,14 @@ function App() {
       },
     ],
     [
-      { title: "Manual 1B", link: "#", isNew: true },
-      { title: "Manual 2B", link: "#", isNew: false },
-      { title: "Manual 3B", link: "#", isNew: true },
+      { title: "Financial Fraud", link: "https://cybercrime.gov.in/pdf/Financial%20Fraud%20Brochures%20final.pdf", isNew: true },
+      { title: "Job Fraud", link: "https://cybercrime.gov.in/pdf/Financial%20Fraud%20Brochures%20final.pdf", isNew: false },
+      { title: "Matrimonial Fraud", link: "https://cybercrime.gov.in/pdf/Matrimonial%20fraud%20brochure%20final.pdf", isNew: true },
     ],
     [
-      { title: "Manual 1C", link: "#", isNew: false },
-      { title: "Manual 2C", link: "#", isNew: true },
-      { title: "Manual 3C", link: "#", isNew: false },
+      { title: "Cyber Hygiene for Cyber Space", link: "https://cybercrime.gov.in/pdf/Final_English_Manual_Basic.pdf", isNew: false },
+      { title: "Safe use of social Media Platform", link: "https://cybercrime.gov.in/pdf/Safe%20Use%20of%20social%20Media%20Platform%20Brochure%20final.pdf", isNew: true },
+      { title: "Cyber Crime", link: "https://cybercrime.gov.in/pdf/Cyber%20Security%20Awareness%20Booklet%20for%20Citizens.pdf", isNew: false },
     ],
   ]);
 
