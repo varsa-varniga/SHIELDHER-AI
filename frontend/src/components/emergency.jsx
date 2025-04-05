@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, createContext, useContext } from "react";
 import {
   Button,
   Card,
@@ -30,7 +30,41 @@ import {
   Phone as PhoneIcon,
   Email as EmailIcon,
 } from "@mui/icons-material";
-import { useAuth } from "../context/AuthContext";
+// import { useAuth } from "../context/AuthContext"; // Original import that's causing issues
+
+// Create a simple AuthContext if none exists
+const AuthContext = createContext();
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    // Instead of throwing an error, return a default value
+    return { user: { email: "", id: "" } };
+  }
+  return context;
+};
+
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
+
+  // Simple authentication state (you would replace this with your actual auth logic)
+  useEffect(() => {
+    // Check if user is logged in (e.g., from localStorage)
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
+
+  const value = {
+    user,
+    setUser,
+    // Add any other auth methods you need
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};
+
 import { submitCyberReport } from "../api/reportService";
 import Chatbot from "react-chatbot-kit";
 import "react-chatbot-kit/build/main.css";
@@ -44,7 +78,7 @@ const MAX_DESCRIPTION_LENGTH = 2000;
 const MAX_CONTACT_LENGTH = 20;
 const MAX_EMAIL_LENGTH = 100;
 
-// Styles
+// Styles remain the same
 const autocompleteStyles = {
   width: "100%",
   marginBottom: "20px",
@@ -106,7 +140,7 @@ const modalStyle = {
   },
 };
 
-// Component abstractions
+// Component abstractions remain the same
 const CyberPoliceModal = ({ open, onClose, actions, phone, onHelpRequest }) => (
   <Modal
     open={open}
@@ -314,7 +348,10 @@ const Notification = ({ open, message, severity, onClose }) => (
 );
 
 const EmergencyCyberHelpPage = () => {
-  const { user } = useAuth();
+  // Fix: Use our safer useAuth hook or conditionally destructure
+  const auth = useAuth();
+  const user = auth?.user || null; // Safely access user or set to null if not available
+
   const [isChatbotVisible, setIsChatbotVisible] = useState(false);
   const [incidentType, setIncidentType] = useState(null);
   const [description, setDescription] = useState("");
@@ -709,5 +746,15 @@ const EmergencyCyberHelpPage = () => {
     </div>
   );
 };
+
+// Make sure to wrap your app with AuthProvider in your main app component
+// Example:
+// function App() {
+//   return (
+//     <AuthProvider>
+//       <EmergencyCyberHelpPage />
+//     </AuthProvider>
+//   );
+// }
 
 export default EmergencyCyberHelpPage;

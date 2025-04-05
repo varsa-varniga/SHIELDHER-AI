@@ -1,10 +1,16 @@
-<!DOCTYPE html>
-<html>
-  <head><title>ShieldHer</title></head>
-  <body style="width:200px;">
-    <h3>🛡️ SHIELDHER</h3>
-    <button onclick="window.open('https://shieldher-platform-url/report')">Report</button><br><br>
-    <button onclick="window.open('https://shieldher-platform-url/awareness')">Awareness</button><br><br>
-    <button onclick="window.open('https://shieldher-platform-url/chatbot')">Chat</button>
-  </body>
-</html>
+const mysql = require('mysql2/promise');
+require('dotenv').config();
+
+const pool = mysql.createPool({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
+});
+
+
+
+module.exports = pool;
