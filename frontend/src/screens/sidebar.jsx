@@ -223,7 +223,7 @@ const CybersecuritySidebar = ({ isExpanded, setIsExpanded }) => {
                 onClick={() => navigate(item.route)}
                 sx={{
                   justifyContent: isExpanded ? 'initial' : 'center',
-                  px: isExpanded ? 3 : 2.5,
+                  px: isExpanded ? 3 : 2,
                   py: 1.5
                 }}
               >
