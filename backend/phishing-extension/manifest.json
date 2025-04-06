@@ -3,7 +3,8 @@
   "name": "Phishing URL Detector",
   "description": "Detect phishing websites and show a notification popup when detected.",
   "version": "1.0",
-  "permissions": ["tabs", "activeTab", "notifications"],
+  "permissions": ["tabs", "activeTab", "notifications", "scripting"],
+  "host_permissions": ["<all_urls>"],
   "background": {
     "service_worker": "background.js"
   },
