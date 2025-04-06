@@ -17,6 +17,11 @@ import {
   Fade,
   Backdrop,
   CircularProgress,
+  Avatar,
+  Chip,
+  Divider,
+  useTheme,
+  styled,
 } from "@mui/material";
 import {
   ReportProblem,
@@ -29,92 +34,158 @@ import {
   Person,
   Phone as PhoneIcon,
   Email as EmailIcon,
+  Bolt,
+  Lock,
+  Public,
 } from "@mui/icons-material";
-// import { useAuth } from "../context/AuthContext"; // Original import that's causing issues
-
-// Create a simple AuthContext if none exists
-const AuthContext = createContext();
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    // Instead of throwing an error, return a default value
-    return { user: { email: "", id: "" } };
-  }
-  return context;
-};
-
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-
-  // Simple authentication state (you would replace this with your actual auth logic)
-  useEffect(() => {
-    // Check if user is logged in (e.g., from localStorage)
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-  }, []);
-
-  const value = {
-    user,
-    setUser,
-    // Add any other auth methods you need
-  };
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-};
-
-import { submitCyberReport } from "../api/reportService";
 import Chatbot from "react-chatbot-kit";
 import "react-chatbot-kit/build/main.css";
 import config from "../chatbot/config";
 import MessageParser from "../chatbot/MessageParser";
 import ActionProvider from "../chatbot/ActionProvider";
+import { submitCyberReport } from "../api/reportService";
 
-// Constants
-const CYBER_POLICE_PHONE = "8072964586";
-const MAX_DESCRIPTION_LENGTH = 2000;
-const MAX_CONTACT_LENGTH = 20;
-const MAX_EMAIL_LENGTH = 100;
+// Cyberpunk color palette
+const colors = {
+  deepSpace: "#0a0e17",
+  cosmicPurple: "#1a1a2e",
+  nebulaBlue: "#16213e",
+  cyberViolet: "#4a148c",
+  matrixGreen: "#00ff9d",
+  electricBlue: "#00d1ff",
+  plasmaPink: "#ff00aa",
+  starlight: "#e6f1ff",
+  cosmicDust: "#7f8c8d",
+  voidBlack: "#000000",
+  hackerGreen: "#39ff14",
+};
 
-// Styles remain the same
-const autocompleteStyles = {
-  width: "100%",
-  marginBottom: "20px",
-  "& .MuiAutocomplete-root": { color: "#fff !important" },
-  "& .MuiAutocomplete-inputRoot": {
-    color: "#fff !important",
-    "& .MuiAutocomplete-input": { color: "#fff !important" },
+// CyberGlass effect
+const CyberGlassBox = styled(Box)(({ theme }) => ({
+  background: "rgba(10, 14, 23, 0.7)",
+  border: "1px solid rgba(0, 255, 157, 0.2)",
+  boxShadow: "0 8px 32px 0 rgba(0, 0, 0, 0.36)",
+  borderRadius: "16px",
+  padding: theme.spacing(4),
+  position: "relative",
+  overflow: "hidden",
+  "&::before": {
+    content: '""',
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    height: "4px",
+    background: `linear-gradient(90deg, ${colors.matrixGreen} 0%, ${colors.electricBlue} 100%)`,
   },
-  "& .MuiInputLabel-root": { color: "#fff !important" },
+}));
+
+const CyberTextField = styled(TextField)({
+  "& .MuiOutlinedInput-root": {
+    color: colors.starlight,
+    borderRadius: "12px",
+    "& fieldset": {
+      borderColor: `${colors.matrixGreen}50`,
+      transition: "all 0.3s ease",
+    },
+    "&:hover fieldset": {
+      borderColor: `${colors.matrixGreen}80`,
+      boxShadow: `0 0 10px ${colors.matrixGreen}30`,
+    },
+    "&.Mui-focused fieldset": {
+      borderColor: colors.matrixGreen,
+      boxShadow: `0 0 15px ${colors.matrixGreen}50`,
+    },
+  },
+  "& .MuiInputLabel-root": {
+    color: `${colors.cosmicDust} !important`,
+  },
+  "& .MuiInputLabel-root.Mui-focused": {
+    color: `${colors.matrixGreen} !important`,
+  },
+  "& input:-webkit-autofill": {
+    WebkitBoxShadow: `0 0 0 100px ${colors.deepSpace} inset`,
+    WebkitTextFillColor: colors.starlight,
+    borderRadius: "12px",
+    caretColor: colors.starlight,
+  },
+});
+
+const CyberButton = styled(Button)({
+  position: "relative",
+  overflow: "hidden",
+  border: "1px solid transparent",
+  background: `linear-gradient(${colors.deepSpace}, ${colors.deepSpace}) padding-box, 
+                linear-gradient(135deg, ${colors.matrixGreen} 0%, ${colors.electricBlue} 100%) border-box`,
+  color: colors.starlight,
+  fontWeight: "bold",
+  letterSpacing: "0.05em",
+  textTransform: "uppercase",
+  transition: "all 0.3s ease",
+  "&:hover": {
+    transform: "translateY(-3px)",
+    boxShadow: `0 10px 20px ${colors.matrixGreen}30`,
+    background: `linear-gradient(${colors.deepSpace}, ${colors.deepSpace}) padding-box, 
+                    linear-gradient(135deg, ${colors.matrixGreen} 0%, ${colors.plasmaPink} 100%) border-box`,
+  },
+  "&:disabled": {
+    background: `${colors.deepSpace} !important`,
+    border: `1px solid ${colors.cosmicDust} !important`,
+    color: `${colors.cosmicDust} !important`,
+  },
+  "&:after": {
+    content: '""',
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%",
+    background: `linear-gradient(90deg, transparent, ${colors.matrixGreen}20, transparent)`,
+    transform: "translateX(-100%)",
+    transition: "transform 0.6s ease",
+  },
+  "&:hover:after": {
+    transform: "translateX(100%)",
+  },
+});
+
+const CyberAutocomplete = styled(Autocomplete)({
+  "& .MuiAutocomplete-inputRoot": {
+    color: colors.starlight,
+    "& .MuiAutocomplete-input": {
+      color: colors.starlight,
+      borderRadius: "12px",
+    },
+  },
+  "& .MuiInputLabel-root": {
+    color: colors.cosmicDust,
+    "&.Mui-focused": {
+      color: colors.matrixGreen,
+    },
+  },
   "& .MuiAutocomplete-popper": {
     "& .MuiAutocomplete-listbox": {
-      backgroundColor: "#253242 !important",
-      color: "#fff !important",
+      backgroundColor: `${colors.nebulaBlue} !important`,
+      color: colors.starlight,
+      border: `1px solid ${colors.matrixGreen}50`,
+      borderRadius: "12px",
     },
     "& .MuiAutocomplete-option": {
-      color: "#fff !important",
+      color: colors.starlight,
       "&.Mui-focused": {
-        backgroundColor: "#007bff !important",
-        color: "#fff !important",
+        backgroundColor: `${colors.matrixGreen}20 !important`,
       },
     },
   },
-};
+});
 
-const textFieldStyles = {
-  width: "100%",
-  marginBottom: "20px",
-  "& .MuiInputLabel-root": { color: "#fff !important" },
-  "& .MuiOutlinedInput-root": {
-    color: "#fff !important",
-    "& input, & textarea": { color: "#fff !important" },
-    "& fieldset": { borderColor: "#fff" },
-    "&:hover fieldset": { borderColor: "#fff" },
-    "&.Mui-focused fieldset": { borderColor: "#007bff" },
-  },
-};
+const CyberText = styled(Typography)({
+  background: `linear-gradient(90deg, ${colors.matrixGreen} 0%, ${colors.electricBlue} 100%)`,
+  WebkitBackgroundClip: "text",
+  WebkitTextFillColor: "transparent",
+  display: "inline-block",
+  fontWeight: "bold",
+});
 
 const modalStyle = {
   position: "absolute",
@@ -122,11 +193,11 @@ const modalStyle = {
   left: "50%",
   transform: "translate(-50%, -50%)",
   width: 600,
-  bgcolor: "#1A2133",
+  bgcolor: colors.nebulaBlue,
   borderRadius: "16px",
-  boxShadow: "0 10px 30px rgba(0, 0, 0, 0.5)",
+  boxShadow: `0 10px 30px ${colors.voidBlack}80`,
   p: 4,
-  border: "1px solid rgba(66, 153, 225, 0.5)",
+  border: `1px solid ${colors.matrixGreen}50`,
   animation: "pulse 2s infinite",
   overflow: "hidden",
   "&::before": {
@@ -136,17 +207,22 @@ const modalStyle = {
     left: 0,
     right: 0,
     height: "5px",
-    background: "linear-gradient(90deg, #3182CE 0%, #63B3ED 100%)",
+    background: `linear-gradient(90deg, ${colors.matrixGreen} 0%, ${colors.electricBlue} 100%)`,
   },
 };
 
-// Component abstractions remain the same
 const CyberPoliceModal = ({ open, onClose, actions, phone, onHelpRequest }) => (
   <Modal
     open={open}
     onClose={onClose}
     closeAfterTransition
     BackdropComponent={Backdrop}
+    BackdropProps={{
+      sx: {
+        backgroundColor: "rgba(0, 0, 0, 0.8)",
+        backdropFilter: "blur(5px)",
+      },
+    }}
   >
     <Fade in={open}>
       <Box sx={modalStyle}>
@@ -159,13 +235,13 @@ const CyberPoliceModal = ({ open, onClose, actions, phone, onHelpRequest }) => (
           }}
         >
           <Box sx={{ display: "flex", alignItems: "center" }}>
-            <Shield sx={{ fontSize: 40, mr: 2, color: "#63B3ED" }} />
+            <Shield sx={{ fontSize: 40, mr: 2, color: colors.electricBlue }} />
             <Typography
               variant="h4"
               component="h2"
               sx={{
                 fontWeight: "bold",
-                color: "#fff",
+                color: colors.starlight,
                 display: "flex",
                 alignItems: "center",
               }}
@@ -174,7 +250,7 @@ const CyberPoliceModal = ({ open, onClose, actions, phone, onHelpRequest }) => (
               <Verified
                 sx={{
                   ml: 1,
-                  color: "#4caf50",
+                  color: colors.matrixGreen,
                   animation: "pulse 1.5s infinite",
                 }}
               />
@@ -182,8 +258,8 @@ const CyberPoliceModal = ({ open, onClose, actions, phone, onHelpRequest }) => (
           </Box>
           <Box
             sx={{
-              bgcolor: "#0A2342",
-              color: "#fff",
+              bgcolor: colors.cyberViolet,
+              color: colors.starlight,
               px: 2,
               py: 0.5,
               borderRadius: "20px",
@@ -199,7 +275,7 @@ const CyberPoliceModal = ({ open, onClose, actions, phone, onHelpRequest }) => (
 
         <Typography
           variant="body1"
-          sx={{ color: "#B2CADE", mb: 3, fontWeight: "medium" }}
+          sx={{ color: colors.cosmicDust, mb: 3, fontWeight: "medium" }}
         >
           Our cyber police unit is ready to assist with your online emergency.
         </Typography>
@@ -224,19 +300,23 @@ const CyberPoliceModal = ({ open, onClose, actions, phone, onHelpRequest }) => (
                 primary={
                   <Typography
                     sx={{
-                      color: "#fff",
+                      color: colors.starlight,
                       fontWeight: "bold",
                       fontSize: "18px",
                       display: "flex",
                       alignItems: "center",
                     }}
                   >
-                    <Check sx={{ color: "#4caf50", mr: 1, fontSize: 20 }} />
+                    <Check
+                      sx={{ color: colors.matrixGreen, mr: 1, fontSize: 20 }}
+                    />
                     {action.text}
                   </Typography>
                 }
                 secondary={
-                  <Typography sx={{ color: "#B2CADE", fontSize: "14px" }}>
+                  <Typography
+                    sx={{ color: colors.cosmicDust, fontSize: "14px" }}
+                  >
                     {action.description}
                   </Typography>
                 }
@@ -246,7 +326,7 @@ const CyberPoliceModal = ({ open, onClose, actions, phone, onHelpRequest }) => (
         </List>
 
         <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
-          <Button
+          <CyberButton
             variant="contained"
             onClick={onHelpRequest}
             sx={{
@@ -255,19 +335,18 @@ const CyberPoliceModal = ({ open, onClose, actions, phone, onHelpRequest }) => (
               borderRadius: "8px",
               fontSize: "18px",
               fontWeight: "bold",
-              background: "linear-gradient(90deg, #3182CE 0%, #63B3ED 100%)",
-              boxShadow: "0 4px 14px rgba(49, 130, 206, 0.5)",
-              transition: "all 0.3s",
+              background: `linear-gradient(90deg, ${colors.matrixGreen} 0%, ${colors.electricBlue} 100%)`,
+              boxShadow: `0 4px 14px ${colors.matrixGreen}50`,
               "&:hover": {
-                background: "linear-gradient(90deg, #2B6CB0 0%, #4299E1 100%)",
+                background: `linear-gradient(90deg, ${colors.matrixGreen} 0%, ${colors.plasmaPink} 100%)`,
                 transform: "translateY(-2px)",
-                boxShadow: "0 6px 20px rgba(49, 130, 206, 0.7)",
+                boxShadow: `0 6px 20px ${colors.matrixGreen}70`,
               },
             }}
             startIcon={<PhoneIcon />}
           >
             Call Cyber Police Now
-          </Button>
+          </CyberButton>
         </Box>
       </Box>
     </Fade>
@@ -284,12 +363,12 @@ const ConfirmationModal = ({ open, phone }) => (
           left: "50%",
           transform: "translate(-50%, -50%)",
           width: 400,
-          bgcolor: "#1A2133",
+          bgcolor: colors.nebulaBlue,
           borderRadius: "16px",
-          boxShadow: "0 10px 30px rgba(0, 0, 0, 0.5)",
+          boxShadow: `0 10px 30px ${colors.voidBlack}80`,
           p: 4,
           textAlign: "center",
-          border: "1px solid rgba(66, 153, 225, 0.5)",
+          border: `1px solid ${colors.matrixGreen}50`,
         }}
       >
         <Box sx={{ mb: 2 }}>
@@ -298,7 +377,7 @@ const ConfirmationModal = ({ open, phone }) => (
               width: "150px",
               height: "150px",
               margin: "0 auto",
-              backgroundColor: "#3182CE",
+              background: `linear-gradient(135deg, ${colors.matrixGreen} 0%, ${colors.electricBlue} 100%)`,
               borderRadius: "50%",
               display: "flex",
               justifyContent: "center",
@@ -306,16 +385,16 @@ const ConfirmationModal = ({ open, phone }) => (
               animation: "pulse 1.5s infinite",
             }}
           >
-            <PhoneIcon sx={{ fontSize: 80, color: "#fff" }} />
+            <PhoneIcon sx={{ fontSize: 80, color: colors.starlight }} />
           </div>
         </Box>
         <Typography
           variant="h5"
-          sx={{ color: "#fff", fontWeight: "bold", mb: 2 }}
+          sx={{ color: colors.starlight, fontWeight: "bold", mb: 2 }}
         >
           Connecting to Cyber Police
         </Typography>
-        <Typography variant="body1" sx={{ color: "#B2CADE" }}>
+        <Typography variant="body1" sx={{ color: colors.cosmicDust }}>
           Initiating call to {phone}. Please stay on the line.
         </Typography>
       </Box>
@@ -335,11 +414,12 @@ const Notification = ({ open, message, severity, onClose }) => (
       severity={severity}
       sx={{
         width: "100%",
-        backgroundColor: "#1A3B5C",
-        color: "#fff",
-        "& .MuiAlert-icon": { color: "#fff" },
-        "& .MuiAlert-message": { color: "#fff" },
-        "& .MuiAlert-action": { color: "#fff" },
+        backgroundColor: colors.nebulaBlue,
+        color: colors.starlight,
+        border: `1px solid ${colors.matrixGreen}50`,
+        "& .MuiAlert-icon": { color: colors.starlight },
+        "& .MuiAlert-message": { color: colors.starlight },
+        "& .MuiAlert-action": { color: colors.starlight },
       }}
     >
       {message}
@@ -347,10 +427,45 @@ const Notification = ({ open, message, severity, onClose }) => (
   </Snackbar>
 );
 
+// Create a simple AuthContext if none exists
+const AuthContext = createContext();
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    return { user: { email: "", id: "" } };
+  }
+  return context;
+};
+
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
+
+  const value = {
+    user,
+    setUser,
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};
+
+// Constants
+const CYBER_POLICE_PHONE = "8072964586";
+const MAX_DESCRIPTION_LENGTH = 2000;
+const MAX_CONTACT_LENGTH = 20;
+const MAX_EMAIL_LENGTH = 100;
+
 const EmergencyCyberHelpPage = () => {
-  // Fix: Use our safer useAuth hook or conditionally destructure
+  const theme = useTheme();
   const auth = useAuth();
-  const user = auth?.user || null; // Safely access user or set to null if not available
+  const user = auth?.user || null;
 
   const [isChatbotVisible, setIsChatbotVisible] = useState(false);
   const [incidentType, setIncidentType] = useState(null);
@@ -411,12 +526,12 @@ const EmergencyCyberHelpPage = () => {
   const cyberPoliceActions = [
     {
       text: "Identify the scammer",
-      icon: <Person sx={{ color: "#4caf50" }} />,
+      icon: <Person sx={{ color: colors.matrixGreen }} />,
       description: "Our cyber forensics team can trace digital footprints",
     },
     {
       text: "Help remove leaked content",
-      icon: <GavelRounded sx={{ color: "#4caf50" }} />,
+      icon: <GavelRounded sx={{ color: colors.matrixGreen }} />,
       description: "We work with platforms to remove harmful content",
     },
   ];
@@ -539,171 +654,284 @@ const EmergencyCyberHelpPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0A2342] via-[#1F4068] to-[#1A3B5C] flex flex-col items-center justify-center p-6 text-center">
-      <div className="max-w-5xl w-full space-y-8">
-        <h1 className="text-6xl font-bold text-white bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-600 animate-pulse">
-          Emergency Cyber Help
-        </h1>
-
-        <p className="text-xl text-gray-200 mb-10 tracking-wide">
-          Immediate action for online threats – Report & Get Help Now!
-        </p>
-
-        <div className="flex justify-center items-center w-full space-x-8">
-          {actionButtons.map((btn) => (
-            <Button
-              key={btn.label}
-              variant="contained"
-              color={btn.color}
-              startIcon={btn.icon}
-              onClick={btn.onClick}
-              sx={{
-                mx: 2,
-                transform: "scale(1)",
-                transition: "all 0.3s",
-                "&:hover": {
-                  transform: "scale(1.1)",
-                  boxShadow: "0px 0px 10px rgba(0,0,0,0.2)",
-                },
-              }}
-              className={`
-                text-lg capitalize py-4 px-6
-                ${
-                  btn.label === "Report an Incident"
-                    ? "bg-red-600"
-                    : btn.label === "AI Chatbot Help"
-                    ? "bg-green-600"
-                    : "bg-blue-600"
-                }
-              `}
-            >
-              {btn.label}
-            </Button>
-          ))}
-        </div>
-
-        <Card
-          sx={{
-            width: "100%",
-            padding: "20px",
-            backgroundColor: "#253242",
-            borderRadius: "10px",
-            boxShadow: "0px 0px 10px rgba(0,0,0,0.2)",
-            marginTop: "30px",
-          }}
-        >
-          <CardContent sx={{ mt: -3 }}>
-            <h2
-              style={{
-                fontSize: "24px",
-                fontWeight: "bold",
-                marginBottom: "10px",
-                color: "#fff",
-              }}
-            >
-              Report an Incident
-            </h2>
-
-            <form onSubmit={handleReportSubmit}>
-              <Autocomplete
-                disablePortal
-                id="incident-type"
-                options={incidentTypes}
-                value={incidentType}
-                sx={autocompleteStyles}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="What happened?"
-                    required
-                    fullWidth
-                    error={!!formErrors.incidentType}
-                    helperText={formErrors.incidentType}
-                    sx={textFieldStyles}
-                  />
-                )}
-                onChange={(event, value) => setIncidentType(value)}
-              />
-
-              <TextField
-                id="email"
-                label="Your Email"
-                type="email"
-                required
-                sx={textFieldStyles}
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                error={!!formErrors.email}
-                helperText={formErrors.email}
-                InputProps={{
-                  style: { color: "#fff" },
-                  startAdornment: (
-                    <EmailIcon sx={{ color: "#fff", mr: 1, fontSize: 20 }} />
-                  ),
-                }}
-              />
-
-              <TextField
-                id="contactNumber"
-                label="Your Contact Number"
-                sx={textFieldStyles}
-                value={contactNumber}
-                onChange={(e) => setContactNumber(e.target.value)}
-                error={!!formErrors.contactNumber}
-                helperText={formErrors.contactNumber}
-                InputProps={{
-                  style: { color: "#fff" },
-                  startAdornment: (
-                    <PhoneIcon sx={{ color: "#fff", mr: 1, fontSize: 20 }} />
-                  ),
-                }}
-              />
-
-              <TextField
-                id="description"
-                label="Describe the issue (optional)"
-                multiline
-                rows={4}
-                sx={textFieldStyles}
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                error={!!formErrors.description}
-                helperText={formErrors.description}
-                InputProps={{ style: { color: "#fff" } }}
-                inputProps={{
-                  maxLength: MAX_DESCRIPTION_LENGTH,
-                }}
-                FormHelperTextProps={{
-                  sx: {
-                    textAlign: "right",
-                    marginLeft: 0,
-                  },
-                }}
-              />
-
-              <Button
-                type="submit"
-                variant="contained"
-                disabled={isSubmitting}
+    <Box
+      sx={{
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: `linear-gradient(135deg, ${colors.deepSpace} 0%, ${colors.cosmicPurple} 100%)`,
+        position: "relative",
+        overflow: "hidden",
+        "&:before": {
+          content: '""',
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          background: `radial-gradient(circle at 20% 30%, ${colors.cyberViolet}20 0%, transparent 50%)`,
+        },
+        "&:after": {
+          content: '""',
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          background: `radial-gradient(circle at 80% 70%, ${colors.plasmaPink}10 0%, transparent 50%)`,
+        },
+      }}
+    >
+      <Box sx={{ maxWidth: "1200px", width: "100%", p: 3 }}>
+        <CyberGlassBox>
+          <Box sx={{ position: "relative", zIndex: 1 }}>
+            <Box sx={{ textAlign: "center", mb: 6 }}>
+              <Chip
+                label="Emergency Response"
                 sx={{
-                  width: "100%",
-                  backgroundColor: "#ff0000",
-                  color: "#fff",
-                  padding: "10px",
-                  fontSize: "18px",
+                  background: `linear-gradient(90deg, ${colors.matrixGreen}20, ${colors.electricBlue}20)`,
+                  color: colors.matrixGreen,
+                  mb: 2,
+                  px: 2,
+                  py: 1,
                   fontWeight: "bold",
-                  "&:hover": { backgroundColor: "#cc0000" },
+                  fontSize: "0.9rem",
+                }}
+                icon={<Bolt sx={{ color: colors.matrixGreen }} />}
+              />
+              <Typography
+                variant="h1"
+                sx={{
+                  fontWeight: 900,
+                  mb: 1,
+                  fontSize: { xs: "2.5rem", md: "3.5rem" },
+                  lineHeight: 1.2,
+                  letterSpacing: "-0.03em",
+                  color: colors.starlight,
                 }}
               >
-                {isSubmitting ? (
-                  <CircularProgress size={24} color="inherit" />
-                ) : (
-                  "Submit Report"
-                )}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
+                <CyberText sx={{ fontSize: "inherit" }}>
+                  CYBER EMERGENCY
+                </CyberText>{" "}
+                RESPONSE
+              </Typography>
+              <Typography
+                variant="h5"
+                sx={{
+                  mb: 3,
+                  color: colors.cosmicDust,
+                  lineHeight: 1.6,
+                  fontSize: { xs: "1rem", md: "1.25rem" },
+                }}
+              >
+                Immediate action for online threats – Report & Get Help Now!
+              </Typography>
+            </Box>
+
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                gap: 4,
+                flexWrap: "wrap",
+                mb: 4,
+              }}
+            >
+              {actionButtons.map((btn) => (
+                <CyberButton
+                  key={btn.label}
+                  variant="contained"
+                  startIcon={btn.icon}
+                  onClick={btn.onClick}
+                  sx={{
+                    px: 6,
+                    py: 1,
+                    fontSize: "1.1rem",
+                    fontWeight: "bold",
+                    minWidth: "250px",
+                    ...(btn.label === "Report an Incident" && {
+                      background: `linear-gradient(135deg, ${colors.plasmaPink} 0%, ${colors.cyberViolet} 100%)`,
+                    }),
+                    ...(btn.label === "AI Chatbot Help" && {
+                      background: `linear-gradient(135deg, ${colors.matrixGreen} 0%, ${colors.electricBlue} 100%)`,
+                    }),
+                    ...(btn.label === "Connect with Cyber Police" && {
+                      background: `linear-gradient(135deg, ${colors.electricBlue} 0%, ${colors.cyberViolet} 100%)`,
+                    }),
+                  }}
+                >
+                  {btn.label}
+                </CyberButton>
+              ))}
+            </Box>
+
+            <Box
+              sx={{
+                background: `linear-gradient(145deg, ${colors.nebulaBlue} 0%, ${colors.cosmicPurple} 100%)`,
+                border: `1px solid ${colors.matrixGreen}30`,
+                borderRadius: "16px",
+                p: 4,
+                position: "relative",
+                overflow: "hidden",
+              }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  mb: 1,
+                  justifyContent: "center",
+                }}
+              >
+                <Avatar
+                  sx={{
+                    bgcolor: `${colors.matrixGreen}20`,
+                    color: colors.matrixGreen,
+                    width: 60,
+                    height: 60,
+                    mr: 3,
+                  }}
+                >
+                  <ReportProblem fontSize="large" />
+                </Avatar>
+                <Typography
+                  variant="h3"
+                  sx={{
+                    fontWeight: 700,
+                    color: colors.starlight,
+                    fontSize: { xs: "1.8rem", md: "2.2rem" },
+                  }}
+                >
+                  INCIDENT REPORT
+                </Typography>
+              </Box>
+
+              <Divider
+                sx={{
+                  background: `linear-gradient(90deg, transparent, ${colors.matrixGreen}50, transparent)`,
+                  height: "1px",
+                  border: "none",
+                  my: 4,
+                }}
+              />
+
+              <form onSubmit={handleReportSubmit}>
+                <CyberAutocomplete
+                  disablePortal
+                  id="incident-type"
+                  options={incidentTypes}
+                  value={incidentType}
+                  renderInput={(params) => (
+                    <CyberTextField
+                      {...params}
+                      label="What happened?"
+                      required
+                      fullWidth
+                      error={!!formErrors.incidentType}
+                      helperText={formErrors.incidentType}
+                      sx={{ mb: 4 }}
+                    />
+                  )}
+                  onChange={(event, value) => setIncidentType(value)}
+                />
+
+                <CyberTextField
+                  id="email"
+                  label="Your Email"
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  error={!!formErrors.email}
+                  helperText={formErrors.email}
+                  InputProps={{
+                    startAdornment: (
+                      <EmailIcon
+                        sx={{ color: colors.matrixGreen, mr: 1, fontSize: 20 }}
+                      />
+                    ),
+                  }}
+                  sx={{ mb: 4 }}
+                  fullWidth
+                />
+
+                <CyberTextField
+                  id="contactNumber"
+                  label="Your Contact Number"
+                  value={contactNumber}
+                  onChange={(e) => setContactNumber(e.target.value)}
+                  error={!!formErrors.contactNumber}
+                  helperText={formErrors.contactNumber}
+                  InputProps={{
+                    startAdornment: (
+                      <PhoneIcon
+                        sx={{ color: colors.matrixGreen, mr: 1, fontSize: 20 }}
+                      />
+                    ),
+                  }}
+                  sx={{ mb: 4 }}
+                  fullWidth
+                />
+
+                <CyberTextField
+                  id="description"
+                  label="Describe the issue (optional)"
+                  multiline
+                  rows={4}
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  error={!!formErrors.description}
+                  helperText={formErrors.description}
+                  InputProps={{
+                    sx: {
+                      alignItems: "flex-start", // Better alignment for multiline
+                    },
+                  }}
+                  inputProps={{
+                    maxLength: MAX_DESCRIPTION_LENGTH,
+                  }}
+                  FormHelperTextProps={{
+                    sx: {
+                      textAlign: "right",
+                      marginLeft: 0,
+                    },
+                  }}
+                  sx={{
+                    mb: 4,
+                    "& .MuiOutlinedInput-root": {
+                      alignItems: "flex-start", // Ensures proper multiline alignment
+                    },
+                  }}
+                  fullWidth
+                />
+
+                <CyberButton
+                  type="submit"
+                  variant="contained"
+                  disabled={isSubmitting}
+                  sx={{
+                    width: "100%",
+                    py: 1,
+                    fontSize: "1.1rem",
+                    fontWeight: "bold",
+                    background: `linear-gradient(135deg, ${colors.plasmaPink} 0%, ${colors.cyberViolet} 100%)`,
+                    "&:hover": {
+                      background: `linear-gradient(135deg, ${colors.cyberViolet} 0%, ${colors.plasmaPink} 100%)`,
+                    },
+                  }}
+                >
+                  {isSubmitting ? (
+                    <CircularProgress size={24} color="inherit" />
+                  ) : (
+                    "SUBMIT REPORT"
+                  )}
+                </CyberButton>
+              </form>
+            </Box>
+          </Box>
+        </CyberGlassBox>
 
         {/* Chatbot Modal */}
         {isChatbotVisible && (
@@ -742,19 +970,9 @@ const EmergencyCyberHelpPage = () => {
           severity={notification.severity}
           onClose={handleCloseNotification}
         />
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 };
-
-// Make sure to wrap your app with AuthProvider in your main app component
-// Example:
-// function App() {
-//   return (
-//     <AuthProvider>
-//       <EmergencyCyberHelpPage />
-//     </AuthProvider>
-//   );
-// }
 
 export default EmergencyCyberHelpPage;

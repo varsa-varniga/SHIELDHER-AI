@@ -24,7 +24,7 @@ function Layout({ isExpanded, setIsExpanded, manuals }) {
     "/signup",
     "/forgot-password",
     "/verify-otp",
-    "/reset-password",
+    "/resetPassword",
   ].includes(location.pathname);
   const isLandingPage = location.pathname === "/";
 

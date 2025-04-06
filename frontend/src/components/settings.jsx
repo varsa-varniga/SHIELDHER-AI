@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   Typography,
@@ -17,6 +18,7 @@ import {
   Slide,
   CircularProgress,
   InputAdornment,
+  Container,
 } from "@mui/material";
 import {
   Edit,
@@ -28,21 +30,135 @@ import {
   Person,
   Email,
   Description,
+  Dangerous,
 } from "@mui/icons-material";
 import { styled } from "@mui/material/styles";
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-// Styled Components
-const GradientPaper = styled(Paper)(({ theme }) => ({
-  background:
-    "linear-gradient(135deg, rgba(30,30,40,0.9) 0%, rgba(45,45,60,0.9) 100%)",
-  backdropFilter: "blur(10px)",
+// Cyberpunk color palette
+const colors = {
+  deepSpace: "#0a0e17",
+  cosmicPurple: "#1a1a2e",
+  nebulaBlue: "#16213e",
+  cyberViolet: "#4a148c",
+  matrixGreen: "#00ff9d",
+  electricBlue: "#00d1ff",
+  plasmaPink: "#ff00aa",
+  starlight: "#e6f1ff",
+  cosmicDust: "#7f8c8d",
+  voidBlack: "#000000",
+  hackerGreen: "#39ff14",
+};
+
+// CyberGlass effect
+const CyberGlassBox = styled(Box)(({ theme }) => ({
+  background: "rgba(10, 14, 23, 0.7)",
+  border: "1px solid rgba(0, 255, 157, 0.2)",
+  boxShadow: "0 8px 32px 0 rgba(0, 0, 0, 0.36)",
   borderRadius: "16px",
-  boxShadow: "0 8px 32px rgba(0, 0, 0, 0.3)",
-  border: "1px solid rgba(255, 255, 255, 0.1)",
+  padding: theme.spacing(4),
+  position: "relative",
   overflow: "hidden",
+  "&:before": {
+    content: '""',
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%",
+    background: `linear-gradient(45deg, transparent 45%, ${colors.matrixGreen}20 50%, transparent 55%)`,
+    opacity: 0.3,
+    pointerEvents: "none",
+  },
 }));
+
+const CyberTextField = styled(TextField)({
+  "& .MuiOutlinedInput-root": {
+    color: colors.starlight,
+    borderRadius: "12px",
+    "& fieldset": {
+      borderColor: `${colors.matrixGreen}50`,
+      transition: "all 0.3s ease",
+    },
+    "&:hover fieldset": {
+      borderColor: `${colors.matrixGreen}80`,
+      boxShadow: `0 0 10px ${colors.matrixGreen}30`,
+    },
+    "&.Mui-focused fieldset": {
+      borderColor: colors.matrixGreen,
+      boxShadow: `0 0 15px ${colors.matrixGreen}50`,
+    },
+  },
+  "& .MuiInputLabel-root": {
+    color: `${colors.cosmicDust} !important`,
+  },
+  "& .MuiInputLabel-root.Mui-focused": {
+    color: `${colors.matrixGreen} !important`,
+  },
+  "& input:-webkit-autofill": {
+    WebkitBoxShadow: `0 0 0 100px ${colors.deepSpace} inset`,
+    WebkitTextFillColor: colors.starlight,
+    borderRadius: "12px",
+    caretColor: colors.starlight,
+  },
+});
+
+const CyberButton = styled(Button)({
+  position: "relative",
+  overflow: "hidden",
+  border: "1px solid transparent",
+  background: `linear-gradient(${colors.deepSpace}, ${colors.deepSpace}) padding-box, 
+              linear-gradient(135deg, ${colors.matrixGreen} 0%, ${colors.electricBlue} 100%) border-box`,
+  color: colors.starlight,
+  fontWeight: "bold",
+  letterSpacing: "0.05em",
+  textTransform: "uppercase",
+  transition: "all 0.3s ease",
+  "&:hover": {
+    transform: "translateY(-3px)",
+    boxShadow: `0 10px 20px ${colors.matrixGreen}30`,
+    background: `linear-gradient(${colors.deepSpace}, ${colors.deepSpace}) padding-box, 
+                linear-gradient(135deg, ${colors.matrixGreen} 0%, ${colors.plasmaPink} 100%) border-box`,
+  },
+  "&:disabled": {
+    background: `${colors.deepSpace} !important`,
+    border: `1px solid ${colors.cosmicDust} !important`,
+    color: `${colors.cosmicDust} !important`,
+  },
+  "&:after": {
+    content: '""',
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%",
+    background: `linear-gradient(90deg, transparent, ${colors.matrixGreen}20, transparent)`,
+    transform: "translateX(-100%)",
+    transition: "transform 0.6s ease",
+  },
+  "&:hover:after": {
+    transform: "translateX(100%)",
+  },
+});
+
+const DangerButton = styled(CyberButton)({
+  background: `linear-gradient(${colors.deepSpace}, ${colors.deepSpace}) padding-box, 
+              linear-gradient(135deg, ${colors.plasmaPink} 0%, ${colors.cyberViolet} 100%) border-box`,
+  "&:hover": {
+    background: `linear-gradient(${colors.deepSpace}, ${colors.deepSpace}) padding-box, 
+                linear-gradient(135deg, ${colors.plasmaPink} 0%, ${colors.cyberViolet} 100%) border-box`,
+  },
+});
+
+const CyberTab = styled(Tab)({
+  color: `${colors.cosmicDust} !important`,
+  "&.Mui-selected": {
+    color: `${colors.matrixGreen} !important`,
+  },
+  "&.Mui-disabled": {
+    color: `${colors.cosmicDust}50 !important`,
+  },
+});
 
 const ProfileTabPanel = ({ children, value, index, ...other }) => (
   <div hidden={value !== index} {...other}>
@@ -77,16 +193,6 @@ const ProfileSettings = () => {
     current: "",
     new: "",
     confirm: "",
-  });
-  const [securitySettings, setSecuritySettings] = useState({
-    twoFactorAuth: true,
-    loginAlerts: true,
-    backupCodes: false,
-  });
-  const [notifications, setNotifications] = useState({
-    security: true,
-    updates: false,
-    newsletters: true,
   });
   const [isGoogleUser] = useState(false);
   const [alerts, setAlerts] = useState({
@@ -238,614 +344,596 @@ const ProfileSettings = () => {
   return (
     <Box
       sx={{
-        maxWidth: "1200px",
-        mx: "auto",
-        py: 6,
-        px: { xs: 2, md: 4 },
+        background: `linear-gradient(135deg, ${colors.deepSpace}, ${colors.cosmicPurple})`,
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: 4,
       }}
     >
-      {/* Header */}
-      <Slide direction="down" in={true} timeout={500}>
-        <Box sx={{ mb: 6, textAlign: "center" }}>
-          <Typography
-            variant="h3"
-            sx={{
-              fontWeight: 700,
-              background:
-                "linear-gradient(90deg,rgb(54, 183, 197),rgb(170, 212, 211))",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              mb: 1,
-            }}
-          >
-            Your Secure Profile
-          </Typography>
-          <Typography
-            variant="subtitle1"
-            sx={{ color: "rgba(255,255,255,0.7)" }}
-          >
-            Manage your account settings and security preferences
-          </Typography>
-        </Box>
-      </Slide>
-
-      {/* Main Content */}
-      <GradientPaper>
-        <Box
-          sx={{ display: "flex", flexDirection: { xs: "column", md: "row" } }}
-        >
-          {/* Sidebar */}
-          <Paper
-            sx={{
-              width: { md: 280 },
-              background: "rgba(20, 20, 30, 0.7)",
-              borderRadius: 0,
-              borderRight: "1px solid rgba(255,255,255,0.1)",
-            }}
-          >
-            <Box
+      <Container maxWidth="lg">
+        {/* Header */}
+        <Slide direction="down" in={true} timeout={500}>
+          <Box sx={{ mb: 4, textAlign: "center" }}>
+            <Typography
+              variant="h3"
               sx={{
-                p: 3,
-                display: "flex",
-                alignItems: "center",
-                borderBottom: "1px solid rgba(255,255,255,0.1)",
+                fontWeight: 800,
+                letterSpacing: "0.05em",
+                background: `linear-gradient(90deg, ${colors.matrixGreen} 0%, ${colors.electricBlue} 100%)`,
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                mb: 1,
+                textTransform: "uppercase",
               }}
             >
-              <Avatar
-                src="/profile-female.jpg"
-                sx={{
-                  width: 64,
-                  height: 64,
-                  mr: 2,
-                  border: "3px solid rgba(255,255,255,0.2)",
-                }}
-              />
-              <Box>
-                <Typography variant="subtitle1" sx={{ color: "white" }}>
-                  {formData.name}
-                </Typography>
-                <Typography
-                  variant="caption"
-                  sx={{ color: "rgba(255,255,255,0.6)" }}
-                >
-                  {securitySettings.twoFactorAuth
-                    ? "Verified Account"
-                    : "Basic Account"}
-                </Typography>
-              </Box>
-            </Box>
+              USER PROFILE TERMINAL
+            </Typography>
+            <Typography variant="subtitle1" sx={{ color: colors.cosmicDust }}>
+              SECURE ACCESS TO ACCOUNT CONFIGURATION
+            </Typography>
+          </Box>
+        </Slide>
 
-            <Tabs
-              value={tabValue}
-              onChange={handleTabChange}
-              orientation="vertical"
-              variant="scrollable"
+        {/* Main Content */}
+        <CyberGlassBox>
+          <Box
+            sx={{ display: "flex", flexDirection: { xs: "column", md: "row" } }}
+          >
+            {/* Sidebar */}
+            <Paper
               sx={{
-                "& .MuiTabs-indicator": {
-                  left: 0,
-                  backgroundColor: "#ff6b6b",
-                },
+                width: { md: 280 },
+                background: "rgba(20, 20, 30, 0.7)",
+                borderRadius: "12px",
+                border: "1px solid rgba(0, 255, 157, 0.2)",
+                mr: { md: 3 },
+                mb: { xs: 3, md: 0 },
               }}
             >
-              <Tab
-                label="Profile"
-                icon={<Person sx={{ fontSize: 20 }} />}
-                iconPosition="start"
-                sx={{
-                  color: "rgba(255,255,255,0.8)",
-                  "&.Mui-selected": { color: "white" },
-                  justifyContent: "flex-start",
-                  minHeight: 48,
-                }}
-              />
-              <Tab
-                label="Change Password"
-                icon={<Security sx={{ fontSize: 20 }} />}
-                iconPosition="start"
-                sx={{
-                  color: "rgba(255,255,255,0.8)",
-                  "&.Mui-selected": { color: "white" },
-                  justifyContent: "flex-start",
-                  minHeight: 48,
-                }}
-                disabled={isGoogleUser}
-              />
-
-              <Tab
-                label="Danger Zone"
-                icon={<Delete sx={{ fontSize: 20 }} />}
-                iconPosition="start"
-                sx={{
-                  color: "rgba(255,107,107,0.8)",
-                  "&.Mui-selected": { color: "#ff6b6b" },
-                  justifyContent: "flex-start",
-                  minHeight: 48,
-                }}
-              />
-            </Tabs>
-          </Paper>
-
-          {/* Content Area */}
-          <Box sx={{ flex: 1 }}>
-            {/* Alerts */}
-            {alerts.error && (
-              <Alert severity="error" sx={{ mx: 3, mt: 3 }}>
-                {alerts.error}
-              </Alert>
-            )}
-            {alerts.success && (
-              <Alert severity="success" sx={{ mx: 3, mt: 3 }}>
-                {alerts.success}
-              </Alert>
-            )}
-
-            {/* Profile Tab */}
-            <ProfileTabPanel value={tabValue} index={0}>
               <Box
                 sx={{
+                  p: 3,
                   display: "flex",
-                  justifyContent: "space-between",
                   alignItems: "center",
-                  mb: 4,
+                  borderBottom: "1px solid rgba(0, 255, 157, 0.1)",
                 }}
               >
-                <Typography
-                  variant="h5"
-                  sx={{ color: "white", fontWeight: 600 }}
-                >
-                  Personal Information
-                </Typography>
-                {!editMode ? (
-                  <Button
-                    variant="contained"
-                    startIcon={<Edit />}
-                    onClick={() => setEditMode(true)}
-                    sx={{
-                      background: "linear-gradient(90deg, #ff6b6b, #ff8e8e)",
-                      "&:hover": {
-                        background: "linear-gradient(90deg, #ff5e5e, #ff7b7b)",
-                      },
-                    }}
+                <Avatar
+                  src="/profile-female.jpg"
+                  sx={{
+                    width: 64,
+                    height: 64,
+                    mr: 2,
+                    border: `2px solid ${colors.matrixGreen}`,
+                  }}
+                />
+                <Box>
+                  <Typography
+                    variant="subtitle1"
+                    sx={{ color: colors.starlight }}
                   >
-                    Edit Profile
-                  </Button>
-                ) : (
-                  <Box sx={{ display: "flex", gap: 2 }}>
-                    <Button
-                      variant="outlined"
-                      onClick={() => setEditMode(false)}
-                      sx={{
-                        color: "white",
-                        borderColor: "rgba(255,255,255,0.3)",
-                      }}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      variant="contained"
-                      onClick={handleProfileSubmit}
-                      sx={{
-                        background: "linear-gradient(90deg, #ff6b6b, #ff8e8e)",
-                        "&:hover": {
-                          background:
-                            "linear-gradient(90deg, #ff5e5e, #ff7b7b)",
-                        },
-                      }}
-                    >
-                      Save Changes
-                    </Button>
-                  </Box>
-                )}
+                    {formData.name}
+                  </Typography>
+                  <Typography
+                    variant="caption"
+                    sx={{ color: colors.matrixGreen }}
+                  >
+                    {isGoogleUser ? "GOOGLE ACCOUNT" : "SECURE ACCOUNT"}
+                  </Typography>
+                </Box>
               </Box>
 
-              <Box
+              <Tabs
+                value={tabValue}
+                onChange={handleTabChange}
+                orientation="vertical"
+                variant="scrollable"
                 sx={{
-                  display: "flex",
-                  flexDirection: { xs: "column", md: "row" },
-                  gap: 4,
+                  "& .MuiTabs-indicator": {
+                    left: 0,
+                    backgroundColor: colors.matrixGreen,
+                  },
                 }}
               >
-                <Box sx={{ flex: 1 }}>
-                  <Box sx={{ mb: 3 }}>
-                    <Typography
-                      variant="subtitle2"
-                      sx={{
-                        color: "rgba(255,255,255,0.7)",
-                        mb: 1,
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 1,
-                      }}
-                    >
-                      <Person fontSize="small" /> Username
-                    </Typography>
-                    {editMode ? (
-                      <TextField
-                        fullWidth
-                        name="name"
-                        value={formData.name | formData.username}
-                        onChange={handleChange}
-                        sx={textFieldStyles}
-                      />
-                    ) : (
-                      <Typography
-                        variant="body1"
-                        sx={{
-                          color: "white",
-                          p: 1.5,
-                          borderRadius: 1,
-                          backgroundColor: "rgba(255,255,255,0.05)",
-                        }}
-                      >
-                        {formData.name}
-                      </Typography>
-                    )}
-                  </Box>
+                <CyberTab
+                  label="USER PROFILE"
+                  icon={<Person sx={{ fontSize: 20 }} />}
+                  iconPosition="start"
+                  sx={{
+                    justifyContent: "flex-start",
+                    minHeight: 48,
+                  }}
+                />
+                <CyberTab
+                  label="SECURITY SETTINGS"
+                  icon={<Security sx={{ fontSize: 20 }} />}
+                  iconPosition="start"
+                  sx={{
+                    justifyContent: "flex-start",
+                    minHeight: 48,
+                  }}
+                  disabled={isGoogleUser}
+                />
+                <CyberTab
+                  label="DANGER ZONE"
+                  icon={<Dangerous sx={{ fontSize: 20 }} />}
+                  iconPosition="start"
+                  sx={{
+                    justifyContent: "flex-start",
+                    minHeight: 48,
+                    color: `${colors.plasmaPink} !important`,
+                    "&.Mui-selected": {
+                      color: `${colors.plasmaPink} !important`,
+                    },
+                  }}
+                />
+              </Tabs>
+            </Paper>
 
-                  <Box sx={{ mb: 3 }}>
-                    <Typography
-                      variant="subtitle2"
-                      sx={{
-                        color: "rgba(255,255,255,0.7)",
-                        mb: 1,
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 1,
-                      }}
-                    >
-                      <Email fontSize="small" /> Email Address
-                    </Typography>
-                    {editMode ? (
-                      <TextField
-                        fullWidth
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        sx={textFieldStyles}
-                      />
-                    ) : (
-                      <Typography
-                        variant="body1"
-                        sx={{
-                          color: "white",
-                          p: 1.5,
-                          borderRadius: 1,
-                          backgroundColor: "rgba(255,255,255,0.05)",
-                        }}
-                      >
-                        {formData.email}
-                      </Typography>
-                    )}
-                  </Box>
-                </Box>
+            {/* Content Area */}
+            <Box sx={{ flex: 1 }}>
+              {/* Alerts */}
+              {alerts.error && (
+                <Alert severity="error" sx={{ mb: 3 }}>
+                  {alerts.error}
+                </Alert>
+              )}
+              {alerts.success && (
+                <Alert severity="success" sx={{ mb: 3 }}>
+                  {alerts.success}
+                </Alert>
+              )}
 
-                <Box sx={{ flex: 1 }}>
-                  <Box sx={{ mb: 3 }}>
-                    <Typography
-                      variant="subtitle2"
-                      sx={{
-                        color: "rgba(255,255,255,0.7)",
-                        mb: 1,
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 1,
-                      }}
-                    >
-                      <Description fontSize="small" /> Bio
-                    </Typography>
-                    {editMode ? (
-                      <TextField
-                        fullWidth
-                        name="bio"
-                        multiline
-                        rows={4}
-                        value={formData.bio}
-                        onChange={handleChange}
-                        sx={textFieldStyles}
-                      />
-                    ) : (
-                      <Typography
-                        variant="body1"
-                        sx={{
-                          color: "white",
-                          p: 1.5,
-                          borderRadius: 1,
-                          backgroundColor: "rgba(255,255,255,0.05)",
-                          whiteSpace: "pre-wrap",
-                        }}
-                      >
-                        {formData.bio}
-                      </Typography>
-                    )}
-                  </Box>
-                </Box>
-              </Box>
-            </ProfileTabPanel>
-
-            {/* Security Tab */}
-            <ProfileTabPanel value={tabValue} index={1}>
-              {isGoogleUser ? (
+              {/* Profile Tab */}
+              <ProfileTabPanel value={tabValue} index={0}>
                 <Box
                   sx={{
-                    p: 4,
-                    textAlign: "center",
-                    backgroundColor: "rgba(255,255,255,0.05)",
-                    borderRadius: 2,
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    mb: 4,
                   }}
                 >
-                  <Lock
-                    sx={{ fontSize: 48, color: "rgba(255,255,255,0.3)", mb: 2 }}
-                  />
-                  <Typography variant="h6" sx={{ color: "white", mb: 1 }}>
-                    Google-Authenticated Account
-                  </Typography>
-                  <Typography sx={{ color: "rgba(255,255,255,0.7)" }}>
-                    Password management is handled through your Google account.
-                  </Typography>
-                </Box>
-              ) : (
-                <>
                   <Typography
                     variant="h5"
-                    sx={{ color: "white", fontWeight: 600, mb: 4 }}
+                    sx={{
+                      color: colors.starlight,
+                      fontWeight: 600,
+                      textTransform: "uppercase",
+                      letterSpacing: "0.05em",
+                    }}
                   >
-                    Account Security
+                    USER PROFILE DATA
                   </Typography>
-
-                  <Box sx={{ mb: 6 }}>
-                    <Typography variant="h6" sx={{ color: "white", mb: 3 }}>
-                      Change Password
-                    </Typography>
-                    <Box component="form" onSubmit={handlePasswordSubmit}>
-                      <Box sx={{ mb: 3 }}>
-                        <Typography
-                          variant="subtitle2"
-                          sx={{
-                            color: "rgba(255,255,255,0.7)",
-                            mb: 1,
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 1,
-                          }}
-                        >
-                          <Lock fontSize="small" /> Current Password
-                        </Typography>
-                        <TextField
-                          fullWidth
-                          name="current"
-                          type={showPasswords.current ? "text" : "password"}
-                          value={passwordData.current}
-                          onChange={handlePasswordChange}
-                          sx={textFieldStyles}
-                          InputProps={{
-                            endAdornment: (
-                              <InputAdornment position="end">
-                                <IconButton
-                                  onClick={() =>
-                                    togglePasswordVisibility("current")
-                                  }
-                                  edge="end"
-                                  sx={{ color: "rgba(255,255,255,0.5)" }}
-                                >
-                                  {showPasswords.current ? (
-                                    <VisibilityOff />
-                                  ) : (
-                                    <Visibility />
-                                  )}
-                                </IconButton>
-                              </InputAdornment>
-                            ),
-                          }}
-                        />
-                      </Box>
-
-                      <Box sx={{ mb: 3 }}>
-                        <Typography
-                          variant="subtitle2"
-                          sx={{
-                            color: "rgba(255,255,255,0.7)",
-                            mb: 1,
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 1,
-                          }}
-                        >
-                          <Lock fontSize="small" /> New Password
-                        </Typography>
-                        <TextField
-                          fullWidth
-                          name="new"
-                          type={showPasswords.new ? "text" : "password"}
-                          value={passwordData.new}
-                          onChange={handlePasswordChange}
-                          sx={textFieldStyles}
-                          InputProps={{
-                            endAdornment: (
-                              <InputAdornment position="end">
-                                <IconButton
-                                  onClick={() =>
-                                    togglePasswordVisibility("new")
-                                  }
-                                  edge="end"
-                                  sx={{ color: "rgba(255,255,255,0.5)" }}
-                                >
-                                  {showPasswords.new ? (
-                                    <VisibilityOff />
-                                  ) : (
-                                    <Visibility />
-                                  )}
-                                </IconButton>
-                              </InputAdornment>
-                            ),
-                          }}
-                        />
-                      </Box>
-
-                      <Box sx={{ mb: 4 }}>
-                        <Typography
-                          variant="subtitle2"
-                          sx={{
-                            color: "rgba(255,255,255,0.7)",
-                            mb: 1,
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 1,
-                          }}
-                        >
-                          <Lock fontSize="small" /> Confirm New Password
-                        </Typography>
-                        <TextField
-                          fullWidth
-                          name="confirm"
-                          type={showPasswords.confirm ? "text" : "password"}
-                          value={passwordData.confirm}
-                          onChange={handlePasswordChange}
-                          sx={textFieldStyles}
-                          InputProps={{
-                            endAdornment: (
-                              <InputAdornment position="end">
-                                <IconButton
-                                  onClick={() =>
-                                    togglePasswordVisibility("confirm")
-                                  }
-                                  edge="end"
-                                  sx={{ color: "rgba(255,255,255,0.5)" }}
-                                >
-                                  {showPasswords.confirm ? (
-                                    <VisibilityOff />
-                                  ) : (
-                                    <Visibility />
-                                  )}
-                                </IconButton>
-                              </InputAdornment>
-                            ),
-                          }}
-                        />
-                      </Box>
-
+                  {!editMode ? (
+                    <CyberButton
+                      variant="contained"
+                      startIcon={<Edit />}
+                      onClick={() => setEditMode(true)}
+                    >
+                      EDIT PROFILE
+                    </CyberButton>
+                  ) : (
+                    <Box sx={{ display: "flex", gap: 2 }}>
                       <Button
-                        type="submit"
-                        variant="contained"
-                        disabled={loading}
+                        variant="outlined"
+                        onClick={() => setEditMode(false)}
                         sx={{
-                          background:
-                            "linear-gradient(90deg, #ff6b6b, #ff8e8e)",
+                          color: colors.starlight,
+                          borderColor: `${colors.matrixGreen}50`,
                           "&:hover": {
-                            background:
-                              "linear-gradient(90deg, #ff5e5e, #ff7b7b)",
+                            borderColor: colors.matrixGreen,
                           },
-                          height: "48px",
-                          width: "200px",
                         }}
                       >
-                        {loading ? (
-                          <CircularProgress size={24} color="inherit" />
-                        ) : (
-                          "Update Password"
-                        )}
+                        CANCEL
                       </Button>
+                      <CyberButton
+                        variant="contained"
+                        onClick={handleProfileSubmit}
+                      >
+                        SAVE CHANGES
+                      </CyberButton>
                     </Box>
-                  </Box>
-                </>
-              )}
-            </ProfileTabPanel>
-
-            {/* Danger Zone Tab */}
-            <ProfileTabPanel value={tabValue} index={2}>
-              <Box
-                sx={{
-                  backgroundColor: "rgba(255,107,107,0.1)",
-                  border: "1px solid rgba(255,107,107,0.3)",
-                  borderRadius: 2,
-                  p: 4,
-                }}
-              >
-                <Typography
-                  variant="h5"
-                  sx={{
-                    color: "#ff6b6b",
-                    fontWeight: 600,
-                    mb: 2,
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 1,
-                  }}
-                >
-                  <Delete /> Danger Zone
-                </Typography>
-                <Typography
-                  variant="body1"
-                  sx={{ color: "rgba(255,255,255,0.8)", mb: 3 }}
-                >
-                  These actions are irreversible. Please proceed with caution.
-                </Typography>
+                  )}
+                </Box>
 
                 <Box
                   sx={{
-                    backgroundColor: "rgba(0,0,0,0.3)",
-                    borderRadius: 1,
-                    p: 3,
-                    mb: 3,
+                    display: "flex",
+                    flexDirection: { xs: "column", md: "row" },
+                    gap: 4,
                   }}
                 >
-                  <Typography variant="h6" sx={{ color: "#ff6b6b", mb: 1 }}>
-                    Delete Account
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{ color: "rgba(255,255,255,0.7)", mb: 2 }}
-                  >
-                    This will permanently delete your account and all associated
-                    data. You won't be able to recover any information after
-                    deletion.
-                  </Typography>
-                  <Button
-                    variant="contained"
-                    color="error"
-                    onClick={handleDeleteAccount}
+                  <Box sx={{ flex: 1 }}>
+                    <Box sx={{ mb: 3 }}>
+                      <Typography
+                        variant="subtitle2"
+                        sx={{
+                          color: colors.cosmicDust,
+                          mb: 1,
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 1,
+                        }}
+                      >
+                        <Person fontSize="small" /> USERNAME
+                      </Typography>
+                      {editMode ? (
+                        <CyberTextField
+                          fullWidth
+                          name="name"
+                          value={formData.name}
+                          onChange={handleChange}
+                        />
+                      ) : (
+                        <Typography
+                          variant="body1"
+                          sx={{
+                            color: colors.starlight,
+                            p: 1.5,
+                            borderRadius: "8px",
+                            backgroundColor: "rgba(0, 255, 157, 0.05)",
+                            border: "1px solid rgba(0, 255, 157, 0.1)",
+                          }}
+                        >
+                          {formData.name}
+                        </Typography>
+                      )}
+                    </Box>
+
+                    <Box sx={{ mb: 3 }}>
+                      <Typography
+                        variant="subtitle2"
+                        sx={{
+                          color: colors.cosmicDust,
+                          mb: 1,
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 1,
+                        }}
+                      >
+                        <Email fontSize="small" /> EMAIL ADDRESS
+                      </Typography>
+                      {editMode ? (
+                        <CyberTextField
+                          fullWidth
+                          name="email"
+                          value={formData.email}
+                          onChange={handleChange}
+                        />
+                      ) : (
+                        <Typography
+                          variant="body1"
+                          sx={{
+                            color: colors.starlight,
+                            p: 1.5,
+                            borderRadius: "8px",
+                            backgroundColor: "rgba(0, 255, 157, 0.05)",
+                            border: "1px solid rgba(0, 255, 157, 0.1)",
+                          }}
+                        >
+                          {formData.email}
+                        </Typography>
+                      )}
+                    </Box>
+                  </Box>
+
+                  <Box sx={{ flex: 1 }}>
+                    <Box sx={{ mb: 3 }}>
+                      <Typography
+                        variant="subtitle2"
+                        sx={{
+                          color: colors.cosmicDust,
+                          mb: 1,
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 1,
+                        }}
+                      >
+                        <Description fontSize="small" /> USER BIO
+                      </Typography>
+                      {editMode ? (
+                        <CyberTextField
+                          fullWidth
+                          name="bio"
+                          multiline
+                          rows={4}
+                          value={formData.bio}
+                          onChange={handleChange}
+                        />
+                      ) : (
+                        <Typography
+                          variant="body1"
+                          sx={{
+                            color: colors.starlight,
+                            p: 1.5,
+                            borderRadius: "8px",
+                            backgroundColor: "rgba(0, 255, 157, 0.05)",
+                            border: "1px solid rgba(0, 255, 157, 0.1)",
+                            whiteSpace: "pre-wrap",
+                            minHeight: "120px",
+                          }}
+                        >
+                          {formData.bio || "No bio provided"}
+                        </Typography>
+                      )}
+                    </Box>
+                  </Box>
+                </Box>
+              </ProfileTabPanel>
+
+              {/* Security Tab */}
+              <ProfileTabPanel value={tabValue} index={1}>
+                {isGoogleUser ? (
+                  <Box
                     sx={{
-                      background: "linear-gradient(90deg, #ff3d3d, #ff6b6b)",
-                      "&:hover": {
-                        background: "linear-gradient(90deg, #ff2d2d, #ff5b5b)",
-                      },
+                      p: 4,
+                      textAlign: "center",
+                      backgroundColor: "rgba(0, 255, 157, 0.05)",
+                      borderRadius: 2,
+                      border: "1px solid rgba(0, 255, 157, 0.1)",
                     }}
                   >
-                    Delete My Account
-                  </Button>
+                    <Lock
+                      sx={{ fontSize: 48, color: colors.matrixGreen, mb: 2 }}
+                    />
+                    <Typography
+                      variant="h6"
+                      sx={{ color: colors.starlight, mb: 1 }}
+                    >
+                      GOOGLE-AUTHENTICATED ACCOUNT
+                    </Typography>
+                    <Typography sx={{ color: colors.cosmicDust }}>
+                      Security management is handled through your Google
+                      account.
+                    </Typography>
+                  </Box>
+                ) : (
+                  <>
+                    <Typography
+                      variant="h5"
+                      sx={{
+                        color: colors.starlight,
+                        fontWeight: 600,
+                        mb: 4,
+                        textTransform: "uppercase",
+                        letterSpacing: "0.05em",
+                      }}
+                    >
+                      SECURITY CONFIGURATION
+                    </Typography>
+
+                    <Box sx={{ mb: 6 }}>
+                      <Typography
+                        variant="h6"
+                        sx={{ color: colors.starlight, mb: 3 }}
+                      >
+                        CHANGE ACCESS CODE
+                      </Typography>
+                      <Box component="form" onSubmit={handlePasswordSubmit}>
+                        <Box sx={{ mb: 3 }}>
+                          <Typography
+                            variant="subtitle2"
+                            sx={{
+                              color: colors.cosmicDust,
+                              mb: 1,
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 1,
+                            }}
+                          >
+                            <Lock fontSize="small" /> CURRENT ACCESS CODE
+                          </Typography>
+                          <CyberTextField
+                            fullWidth
+                            name="current"
+                            type={showPasswords.current ? "text" : "password"}
+                            value={passwordData.current}
+                            onChange={handlePasswordChange}
+                            InputProps={{
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  <IconButton
+                                    onClick={() =>
+                                      togglePasswordVisibility("current")
+                                    }
+                                    edge="end"
+                                    sx={{ color: colors.matrixGreen }}
+                                  >
+                                    {showPasswords.current ? (
+                                      <VisibilityOff />
+                                    ) : (
+                                      <Visibility />
+                                    )}
+                                  </IconButton>
+                                </InputAdornment>
+                              ),
+                            }}
+                          />
+                        </Box>
+
+                        <Box sx={{ mb: 3 }}>
+                          <Typography
+                            variant="subtitle2"
+                            sx={{
+                              color: colors.cosmicDust,
+                              mb: 1,
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 1,
+                            }}
+                          >
+                            <Lock fontSize="small" /> NEW ACCESS CODE
+                          </Typography>
+                          <CyberTextField
+                            fullWidth
+                            name="new"
+                            type={showPasswords.new ? "text" : "password"}
+                            value={passwordData.new}
+                            onChange={handlePasswordChange}
+                            InputProps={{
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  <IconButton
+                                    onClick={() =>
+                                      togglePasswordVisibility("new")
+                                    }
+                                    edge="end"
+                                    sx={{ color: colors.matrixGreen }}
+                                  >
+                                    {showPasswords.new ? (
+                                      <VisibilityOff />
+                                    ) : (
+                                      <Visibility />
+                                    )}
+                                  </IconButton>
+                                </InputAdornment>
+                              ),
+                            }}
+                          />
+                        </Box>
+
+                        <Box sx={{ mb: 4 }}>
+                          <Typography
+                            variant="subtitle2"
+                            sx={{
+                              color: colors.cosmicDust,
+                              mb: 1,
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 1,
+                            }}
+                          >
+                            <Lock fontSize="small" /> CONFIRM NEW ACCESS CODE
+                          </Typography>
+                          <CyberTextField
+                            fullWidth
+                            name="confirm"
+                            type={showPasswords.confirm ? "text" : "password"}
+                            value={passwordData.confirm}
+                            onChange={handlePasswordChange}
+                            InputProps={{
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  <IconButton
+                                    onClick={() =>
+                                      togglePasswordVisibility("confirm")
+                                    }
+                                    edge="end"
+                                    sx={{ color: colors.matrixGreen }}
+                                  >
+                                    {showPasswords.confirm ? (
+                                      <VisibilityOff />
+                                    ) : (
+                                      <Visibility />
+                                    )}
+                                  </IconButton>
+                                </InputAdornment>
+                              ),
+                            }}
+                          />
+                        </Box>
+
+                        <CyberButton
+                          type="submit"
+                          variant="contained"
+                          disabled={loading}
+                          sx={{
+                            height: "48px",
+                            width: "250px",
+                          }}
+                        >
+                          {loading ? (
+                            <>
+                              <CircularProgress
+                                size={24}
+                                color="inherit"
+                                sx={{ mr: 1 }}
+                              />
+                              UPDATING...
+                            </>
+                          ) : (
+                            "UPDATE ACCESS CODE"
+                          )}
+                        </CyberButton>
+                      </Box>
+                    </Box>
+                  </>
+                )}
+              </ProfileTabPanel>
+
+              {/* Danger Zone Tab */}
+              <ProfileTabPanel value={tabValue} index={2}>
+                <Box
+                  sx={{
+                    backgroundColor: "rgba(255,0,106,0.1)",
+                    border: "1px solid rgba(255,0,106,0.3)",
+                    borderRadius: 2,
+                    p: 4,
+                  }}
+                >
+                  <Typography
+                    variant="h5"
+                    sx={{
+                      color: colors.plasmaPink,
+                      fontWeight: 600,
+                      mb: 2,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                      textTransform: "uppercase",
+                      letterSpacing: "0.05em",
+                    }}
+                  >
+                    <Dangerous /> DANGER ZONE
+                  </Typography>
+                  <Typography
+                    variant="body1"
+                    sx={{ color: colors.cosmicDust, mb: 3 }}
+                  >
+                    WARNING: These actions are irreversible. Proceed with
+                    extreme caution.
+                  </Typography>
+
+                  <CyberGlassBox
+                    sx={{
+                      backgroundColor: "rgba(255,0,106,0.1)",
+                      border: "1px solid rgba(255,0,106,0.3)",
+                      mb: 3,
+                    }}
+                  >
+                    <Typography
+                      variant="h6"
+                      sx={{ color: colors.plasmaPink, mb: 1 }}
+                    >
+                      ACCOUNT TERMINATION
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{ color: colors.cosmicDust, mb: 2 }}
+                    >
+                      This will permanently delete your account and all
+                      associated data. This action cannot be undone.
+                    </Typography>
+                    <DangerButton
+                      variant="contained"
+                      onClick={handleDeleteAccount}
+                      startIcon={<Delete />}
+                    >
+                      TERMINATE ACCOUNT
+                    </DangerButton>
+                  </CyberGlassBox>
                 </Box>
-              </Box>
-            </ProfileTabPanel>
+              </ProfileTabPanel>
+            </Box>
           </Box>
-        </Box>
-      </GradientPaper>
+        </CyberGlassBox>
+      </Container>
     </Box>
   );
-};
-
-const textFieldStyles = {
-  "& .MuiOutlinedInput-root": {
-    "& fieldset": {
-      borderColor: "rgba(255,255,255,0.2)",
-      borderRadius: "8px",
-    },
-    "&:hover fieldset": {
-      borderColor: "rgba(255,255,255,0.3)",
-    },
-    "&.Mui-focused fieldset": {
-      borderColor: "#ff6b6b",
-      boxShadow: "0 0 0 2px rgba(255,107,107,0.2)",
-    },
-  },
-  "& .MuiInputLabel-root": {
-    color: "rgba(255,255,255,0.7)",
-  },
-  "& .MuiInputBase-input": {
-    color: "white",
-  },
-  "& .MuiInputBase-input::placeholder": {
-    color: "rgba(255,255,255,0.5)",
-    opacity: 1,
-  },
 };
 
 export default ProfileSettings;

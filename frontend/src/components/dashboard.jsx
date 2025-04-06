@@ -846,8 +846,8 @@ const SecurityDashboard = () => {
                 borderRadius: "16px",
                 position: "relative",
                 boxShadow: `0 0 15px ${colors.matrixGreen}40, 0 0 30px ${colors.electricBlue}20`,
-                background: `linear-gradient(135deg, ${colors.deepSpace}, ${colors.nebulaBlue})`,
                 border: `1px solid ${colors.matrixGreen}30`,
+                ...cyberCardGlow,
               }}
             >
               <CardContent

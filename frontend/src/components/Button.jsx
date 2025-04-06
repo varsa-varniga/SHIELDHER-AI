@@ -1,50 +1,96 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import { Button, styled } from "@mui/material";
 
-const CButton = ({ label = 'Attempt Quiz', to = '/cyberquiz' }) => {
+// Cyberpunk color palette
+const colors = {
+  deepSpace: "#0a0e17",
+  cosmicPurple: "#1a1a2e",
+  nebulaBlue: "#16213e",
+  cyberViolet: "#4a148c",
+  matrixGreen: "#00ff9d",
+  electricBlue: "#00d1ff",
+  plasmaPink: "#ff00aa",
+  starlight: "#e6f1ff",
+  cosmicDust: "#7f8c8d",
+  voidBlack: "#000000",
+  hackerGreen: "#39ff14",
+};
+
+const CyberButton = styled(Button)({
+  position: "relative",
+  overflow: "hidden",
+  border: "1px solid transparent",
+  background: `linear-gradient(${colors.deepSpace}, ${colors.deepSpace}) padding-box, 
+              linear-gradient(135deg, ${colors.matrixGreen} 0%, ${colors.electricBlue} 100%) border-box`,
+  color: colors.starlight,
+  fontWeight: "bold",
+  letterSpacing: "0.05em",
+  textTransform: "uppercase",
+  transition: "all 0.3s ease",
+  "&:hover": {
+    transform: "translateY(-3px)",
+    boxShadow: `0 10px 20px ${colors.matrixGreen}30`,
+    background: `linear-gradient(${colors.deepSpace}, ${colors.deepSpace}) padding-box, 
+                linear-gradient(135deg, ${colors.matrixGreen} 0%, ${colors.plasmaPink} 100%) border-box`,
+  },
+  "&:disabled": {
+    background: `${colors.deepSpace} !important`,
+    border: `1px solid ${colors.cosmicDust} !important`,
+    color: `${colors.cosmicDust} !important`,
+  },
+  "&:after": {
+    content: '""',
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%",
+    background: `linear-gradient(90deg, transparent, ${colors.matrixGreen}20, transparent)`,
+    transform: "translateX(-100%)",
+    transition: "transform 0.6s ease",
+  },
+  "&:hover:after": {
+    transform: "translateX(100%)",
+  },
+});
+
+const CButton = ({
+  label = "Attempt Quiz",
+  to = "/cyberquiz",
+  type = "button",
+  fullWidth = false,
+  disabled = false,
+  loading = false,
+}) => {
   const navigate = useNavigate();
 
-  const buttonStyle = {
-    background: 'linear-gradient(45deg, #38BDF8, #818CF8)',
-    boxShadow: '0 0 20px rgba(56, 189, 248, 0.5)',
-    color: 'white',
-    padding: '12px 36px',
-    fontSize: '1.2rem',
-    textTransform: 'none',
-    borderRadius: '30px',
-    border: 'none',
-    cursor: 'pointer',
-    transition: 'transform 0.3s ease, box-shadow 0.3s ease, background-position 0.5s ease',
-    justifyContent: 'center',
-    alignItems: 'center',
-    display: 'flex',
-    margin: '20px auto',
-    textAlign: 'center',
-    textDecoration: 'none',
-    fontWeight: 'bold',
-    fontFamily: 'Arial, sans-serif',
-    fontStyle: 'italic',
-    letterSpacing: '1px',
-    backgroundSize: '200% 200%',
-    backgroundPosition: 'right center',
-    WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent',
-    textShadow: '0 0 20px rgba(56, 189, 248, 0.7)',
-  };
-
-
   const handleClick = () => {
-    navigate(to);
+    if (to) {
+      navigate(to);
+    }
   };
 
   return (
-    <button
-      style={buttonStyle}
+    <CyberButton
+      type={type}
+      fullWidth={fullWidth}
+      variant="contained"
+      disabled={disabled || loading}
       onClick={handleClick}
-      
+      sx={{
+        mt: 3,
+        mb: 2,
+        py: 1.5,
+        borderRadius: "12px",
+        mx: "auto",
+        display: "flex",
+        justifyContent: "center",
+        minWidth: "250px",
+      }}
     >
-      {label}
-    </button>
+      {loading ? "INITIATING..." : label}
+    </CyberButton>
   );
 };
 
