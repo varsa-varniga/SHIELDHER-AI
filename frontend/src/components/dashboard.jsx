@@ -43,47 +43,62 @@ import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 import FirewallRules from "./firewall";
 
-// Custom theme configuration
+// Define the cyberpunk theme colors based on the landing page
+const colors = {
+  deepSpace: "#0a0e17",
+  cosmicPurple: "#1a1a2e",
+  nebulaBlue: "#16213e",
+  cyberViolet: "#4a148c",
+  matrixGreen: "#00ff9d",
+  electricBlue: "#00d1ff",
+  plasmaPink: "#FF0000",
+  starlight: "#e6f1ff",
+  cosmicDust: "#7f8c8d",
+  voidBlack: "#000000",
+  hackerGreen: "#39ff14",
+};
+
+// Custom theme configuration with cyberpunk colors
 const theme = createTheme({
   palette: {
     background: {
-      default: "#1a2634",
-      paper: "#253242",
+      default: colors.deepSpace,
+      paper: colors.nebulaBlue,
     },
     text: {
-      primary: "#ffffff",
-      secondary: "#b0bec5",
+      primary: colors.starlight,
+      secondary: colors.cosmicDust,
     },
     primary: {
-      main: "#3f7afc",
+      main: colors.matrixGreen,
     },
     secondary: {
-      main: "#ff6b6b",
+      main: colors.electricBlue,
     },
     success: {
-      main: "#4caf50",
+      main: colors.hackerGreen,
     },
     error: {
-      main: "#ff3f34",
+      main: colors.plasmaPink,
     },
     warning: {
-      main: "#feca57",
+      main: "#feca57", // Keeping this for contrast
     },
     threatColors: {
       high: {
-        main: "#FF4D4D",
-        light: "#FFE5E5",
-        contrastText: "#fff",
+        main: colors.plasmaPink,
+        light: `${colors.plasmaPink}20`,
+        contrastText: colors.starlight,
       },
       medium: {
-        main: "#FF9F1C",
-        light: "#FFF4E5",
-        contrastText: "#fff",
+        main: colors.electricBlue,
+        light: `${colors.electricBlue}20`,
+        contrastText: colors.starlight,
       },
       low: {
-        main: "#2EC4B6",
-        light: "#E5F6F4",
-        contrastText: "#fff",
+        main: colors.matrixGreen,
+        light: `${colors.matrixGreen}20`,
+        contrastText: colors.voidBlack,
       },
     },
   },
@@ -97,6 +112,45 @@ const theme = createTheme({
           textTransform: "none",
           borderRadius: 12,
           padding: "10px 20px",
+          background: `linear-gradient(135deg, ${colors.nebulaBlue} 0%, ${colors.cosmicPurple} 100%)`,
+          border: `1px solid ${colors.matrixGreen}30`,
+          boxShadow: `0 8px 32px 0 ${colors.deepSpace}80`,
+        },
+      },
+    },
+    MuiButton: {
+      styleOverrides: {
+        contained: {
+          background: `linear-gradient(90deg, ${colors.matrixGreen}, ${colors.electricBlue})`,
+          color: colors.deepSpace,
+          fontWeight: "bold",
+          "&:hover": {
+            background: `linear-gradient(90deg, ${colors.electricBlue}, ${colors.matrixGreen})`,
+            boxShadow: `0 0 15px ${colors.matrixGreen}`,
+          },
+        },
+        outlined: {
+          borderColor: colors.matrixGreen,
+          color: colors.matrixGreen,
+          "&:hover": {
+            borderColor: colors.electricBlue,
+            color: colors.electricBlue,
+            boxShadow: `0 0 10px ${colors.matrixGreen}50`,
+          },
+        },
+      },
+    },
+    MuiChip: {
+      styleOverrides: {
+        root: {
+          borderRadius: 16,
+        },
+      },
+    },
+    MuiTableCell: {
+      styleOverrides: {
+        root: {
+          borderBottom: `1px solid ${colors.matrixGreen}30`,
         },
       },
     },
@@ -110,8 +164,8 @@ const EmailAuthModal = ({ open, onClose, onAuthenticate }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-// Update this in the EmailAuthModal component
-const BACKEND_URL = "http://127.0.0.1:5000";
+  // Update this in the EmailAuthModal component
+  const BACKEND_URL = "http://127.0.0.1:5000";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -176,9 +230,9 @@ const BACKEND_URL = "http://127.0.0.1:5000";
           left: "50%",
           transform: "translate(-50%, -50%)",
           width: 400,
-          bgcolor: "background.paper",
-          border: "1px solid #000",
-          boxShadow: 24,
+          bgcolor: colors.nebulaBlue,
+          border: `1px solid ${colors.matrixGreen}50`,
+          boxShadow: `0 0 25px ${colors.matrixGreen}30`,
           p: 4,
           borderRadius: 2,
         }}
@@ -187,7 +241,12 @@ const BACKEND_URL = "http://127.0.0.1:5000";
           id="email-auth-modal"
           variant="h6"
           component="h2"
-          sx={{ mb: 2, display: "flex", alignItems: "center" }}
+          sx={{
+            mb: 2,
+            display: "flex",
+            alignItems: "center",
+            color: colors.matrixGreen,
+          }}
         >
           <EmailIcon sx={{ mr: 1 }} /> Connect Your Email
         </Typography>
@@ -203,7 +262,26 @@ const BACKEND_URL = "http://127.0.0.1:5000";
             onChange={(e) => setEmail(e.target.value)}
             fullWidth
             required
-            sx={{ mb: 2 }}
+            sx={{
+              mb: 2,
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": {
+                  borderColor: `${colors.matrixGreen}50`,
+                },
+                "&:hover fieldset": {
+                  borderColor: colors.matrixGreen,
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: colors.electricBlue,
+                },
+              },
+              "& .MuiInputLabel-root": {
+                color: colors.cosmicDust,
+              },
+              "& .MuiInputBase-input": {
+                color: colors.starlight,
+              },
+            }}
           />
           <TextField
             label="Password"
@@ -212,7 +290,26 @@ const BACKEND_URL = "http://127.0.0.1:5000";
             onChange={(e) => setPassword(e.target.value)}
             fullWidth
             required
-            sx={{ mb: 3 }}
+            sx={{
+              mb: 3,
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": {
+                  borderColor: `${colors.matrixGreen}50`,
+                },
+                "&:hover fieldset": {
+                  borderColor: colors.matrixGreen,
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: colors.electricBlue,
+                },
+              },
+              "& .MuiInputLabel-root": {
+                color: colors.cosmicDust,
+              },
+              "& .MuiInputBase-input": {
+                color: colors.starlight,
+              },
+            }}
           />
           {error && (
             <Alert severity="error" sx={{ mb: 2 }}>
@@ -292,8 +389,8 @@ const SecurityDashboard = () => {
   // Computed threats based on email connection status
   const threats = emailConnected ? actualThreats : dummyThreats;
 
- const user = JSON.parse(localStorage.getItem("user")) || {};
-  const {name, username } = user;
+  const user = JSON.parse(localStorage.getItem("user")) || {};
+  const { name, username } = user;
 
   const [notification, setNotification] = useState({
     open: false,
@@ -339,7 +436,6 @@ const SecurityDashboard = () => {
       resolvedBy: "System Update",
     },
   ]);
-
 
   // Email authentication states
   const [emailAuthModalOpen, setEmailAuthModalOpen] = useState(false);
@@ -449,9 +545,9 @@ const SecurityDashboard = () => {
   };
 
   const getProgressColor = (score) => {
-    if (score < 50) return "#ff6b6b";
-    if (score < 75) return "#feca57";
-    return "#48dbfb";
+    if (score < 50) return colors.plasmaPink;
+    if (score < 75) return colors.electricBlue;
+    return colors.matrixGreen;
   };
 
   const removeThreatFromHistory = (threatId) => {
@@ -526,6 +622,39 @@ const SecurityDashboard = () => {
     }
   };
 
+  // Cyber text animation effect for headers
+  // Cyber text animation effect for headers
+  const CyberTextStyles = {
+    position: "relative",
+    color: colors.matrixGreen,
+    fontWeight: 900,
+    letterSpacing: "1px",
+    display: "inline",
+  };
+
+  // Cyber card glow effect
+  const cyberCardGlow = {
+    position: "relative",
+    "&::before": {
+      content: '""',
+      position: "absolute",
+      top: -2,
+      left: -2,
+      right: -2,
+      bottom: -2,
+      background: `linear-gradient(45deg, ${colors.matrixGreen}, ${colors.electricBlue}, ${colors.plasmaPink})`,
+      borderRadius: "14px",
+      zIndex: -1,
+      opacity: 0.3,
+      animation: "glowPulse 5s linear infinite",
+    },
+    "@keyframes glowPulse": {
+      "0%": { opacity: 0.3 },
+      "50%": { opacity: 0.6 },
+      "100%": { opacity: 0.3 },
+    },
+  };
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -535,8 +664,37 @@ const SecurityDashboard = () => {
           minHeight: "100vh",
           p: 4,
           color: "text.primary",
+          backgroundImage: `radial-gradient(circle at 10% 20%, ${colors.cosmicPurple}90 0%, ${colors.deepSpace} 80%)`,
+          position: "relative",
+          overflow: "hidden",
+          "&::before": {
+            content: '""',
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: `url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='${colors.matrixGreen}' fill-opacity='0.03' fill-rule='evenodd'/%3E%3C/svg%3E")`,
+            opacity: 0.6,
+            zIndex: 0,
+          },
         }}
       >
+        {/* Cyber grid lines */}
+        <Box
+          sx={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: `linear-gradient(90deg, ${colors.matrixGreen}03 1px, transparent 1px), 
+                        linear-gradient(${colors.matrixGreen}03 1px, transparent 1px)`,
+            backgroundSize: "50px 50px",
+            zIndex: 0,
+          }}
+        />
+
         {/* Header */}
         <Typography
           variant="h4"
@@ -544,12 +702,28 @@ const SecurityDashboard = () => {
             mb: 4,
             fontWeight: 700,
             color: "text.primary",
+            position: "relative",
+            zIndex: 1,
+            textShadow: `0 0 10px ${colors.deepSpace}`,
+            display: "flex",
+            alignItems: "center",
+            "&::after": {
+              content: '""',
+              display: "inline-block",
+              width: "50px",
+              height: "3px",
+              background: `linear-gradient(90deg, ${colors.matrixGreen}, transparent)`,
+              marginLeft: "15px",
+            },
           }}
         >
-          Welcome, {username || name}
+          Welcome,{" "}
+          <Box component="span" sx={CyberTextStyles}>
+            {username || name || "Cyber Defender"}
+          </Box>
         </Typography>
 
-        <Grid container spacing={2}>
+        <Grid container spacing={3} sx={{ position: "relative", zIndex: 1 }}>
           {/* Security Score */}
           <Grid item xs={12} md={4}>
             <Card
@@ -557,7 +731,8 @@ const SecurityDashboard = () => {
                 height: "100%",
                 display: "flex",
                 flexDirection: "column",
-                backgroundColor: "background.paper",
+                borderRadius: "16px",
+                ...cyberCardGlow,
               }}
             >
               <CardContent
@@ -569,8 +744,17 @@ const SecurityDashboard = () => {
                 }}
               >
                 <Box sx={{ display: "flex", alignItems: "center", mt: -1 }}>
-                  <SecurityIcon sx={{ mr: 2, color: "primary.main" }} />
-                  <Typography variant="h6">Security Score</Typography>
+                  <SecurityIcon sx={{ mr: 2, color: colors.matrixGreen }} />
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      background: `linear-gradient(90deg, ${colors.matrixGreen}, ${colors.electricBlue})`,
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                    }}
+                  >
+                    Security Score
+                  </Typography>
                 </Box>
                 <Box
                   sx={{
@@ -578,14 +762,34 @@ const SecurityDashboard = () => {
                     justifyContent: "center",
                     alignItems: "center",
                     flexGrow: 1,
+                    position: "relative",
+                    "&::after": {
+                      content: '""',
+                      position: "absolute",
+                      width: "200px",
+                      height: "200px",
+                      borderRadius: "50%",
+                      background: `radial-gradient(circle, ${getProgressColor(
+                        securityScore
+                      )}20 0%, transparent 70%)`,
+                      zIndex: 0,
+                    },
                   }}
                 >
-                  <Box sx={{ width: 180, height: 180, mb: 1 }}>
+                  <Box
+                    sx={{
+                      width: 180,
+                      height: 180,
+                      mb: 1,
+                      position: "relative",
+                      zIndex: 1,
+                    }}
+                  >
                     <CircularProgressbar
                       value={securityScore}
                       text={`${securityScore}%`}
                       styles={buildStyles({
-                        textColor: "white",
+                        textColor: colors.starlight,
                         pathColor: getProgressColor(securityScore),
                         trailColor: "rgba(255,255,255,0.1)",
                         textSize: "24px",
@@ -607,7 +811,27 @@ const SecurityDashboard = () => {
                   color="primary"
                   startIcon={<EmailIcon />}
                   onClick={handleEmailConnect}
-                  sx={{ mt: 2 }}
+                  sx={{
+                    mt: 2,
+                    position: "relative",
+                    overflow: "hidden",
+                    "&::before": {
+                      content: '""',
+                      position: "absolute",
+                      top: 0,
+                      left: -100,
+                      width: "50px",
+                      height: "100%",
+                      background: `linear-gradient(90deg, transparent, ${colors.matrixGreen}40, transparent)`,
+                      animation: "cyberscan 2s infinite",
+                      zIndex: 0,
+                      display: emailConnected ? "block" : "none",
+                    },
+                    "@keyframes cyberscan": {
+                      "0%": { left: -100 },
+                      "100%": { left: "100%" },
+                    },
+                  }}
                 >
                   {emailConnected ? "Rescan Email" : "Connect Email"}
                 </Button>
@@ -615,12 +839,15 @@ const SecurityDashboard = () => {
             </Card>
           </Grid>
 
-          {/* Recent Alerts */}
           <Grid item xs={12} md={8}>
             <Card
               sx={{
                 height: "100%",
-                backgroundColor: "background.paper",
+                borderRadius: "16px",
+                position: "relative",
+                boxShadow: `0 0 15px ${colors.matrixGreen}40, 0 0 30px ${colors.electricBlue}20`,
+                background: `linear-gradient(135deg, ${colors.deepSpace}, ${colors.nebulaBlue})`,
+                border: `1px solid ${colors.matrixGreen}30`,
               }}
             >
               <CardContent
@@ -634,14 +861,21 @@ const SecurityDashboard = () => {
                 <Box
                   sx={{ display: "flex", alignItems: "center", mb: 2, mt: -1 }}
                 >
-                  <EmpowerIcon sx={{ mr: 2, color: "success.main" }} />
-                  <Typography variant="h6">
+                  <EmpowerIcon sx={{ mr: 2, color: colors.hackerGreen }} />
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      background: `linear-gradient(90deg, ${colors.matrixGreen}, ${colors.electricBlue})`,
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                    }}
+                  >
                     Your Safety, Our Priority
                   </Typography>
                 </Box>
                 <Typography
                   variant="body1"
-                  sx={{ mb: 2, color: "text.secondary" }}
+                  sx={{ mb: 2, color: colors.starlight }}
                 >
                   We're committed to providing you with the most comprehensive
                   and trustworthy security experience. Every feature is designed
@@ -659,13 +893,17 @@ const SecurityDashboard = () => {
                     sx={{
                       display: "flex",
                       alignItems: "center",
-                      backgroundColor: "rgba(76, 175, 80, 0.1)",
+                      backgroundColor: `${colors.matrixGreen}15`,
                       borderRadius: 2,
                       p: 2,
+                      border: `1px solid ${colors.matrixGreen}30`,
                     }}
                   >
-                    <StarIcon sx={{ mr: 2, color: "success.main" }} />
-                    <Typography variant="body2" sx={{ color: "text.primary" }}>
+                    <StarIcon sx={{ mr: 2, color: colors.hackerGreen }} />
+                    <Typography
+                      variant="body2"
+                      sx={{ color: colors.starlight }}
+                    >
                       Your trust is our greatest security measure. We
                       continuously evolve to stay ahead of potential threats.
                     </Typography>
@@ -674,13 +912,17 @@ const SecurityDashboard = () => {
                     sx={{
                       display: "flex",
                       alignItems: "center",
-                      backgroundColor: "rgba(76, 175, 80, 0.1)",
+                      backgroundColor: `${colors.matrixGreen}15`,
                       borderRadius: 2,
                       p: 2,
+                      border: `1px solid ${colors.matrixGreen}30`,
                     }}
                   >
-                    <StarIcon sx={{ mr: 2, color: "success.main" }} />
-                    <Typography variant="body2" sx={{ color: "text.primary" }}>
+                    <StarIcon sx={{ mr: 2, color: colors.hackerGreen }} />
+                    <Typography
+                      variant="body2"
+                      sx={{ color: colors.starlight }}
+                    >
                       {emailConnected
                         ? "Email connected! We're actively monitoring for phishing attempts."
                         : "New! Our email phishing detection uses advanced ML to identify and protect against sophisticated email threats."}
@@ -693,11 +935,27 @@ const SecurityDashboard = () => {
 
           {/* Security Suggestions */}
           <Grid item xs={12}>
-            <Card sx={{ backgroundColor: "background.paper" }}>
+            <Card
+              sx={{
+                background: `linear-gradient(135deg, ${colors.deepSpace}, ${colors.nebulaBlue})`,
+                boxShadow: `0 0 15px ${colors.matrixGreen}30, 0 0 30px ${colors.electricBlue}15`,
+                border: `1px solid ${colors.matrixGreen}30`,
+                borderRadius: "16px",
+              }}
+            >
               <CardContent>
                 <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                  <CheckCircleIcon sx={{ mr: 2, color: "primary.main" }} />
-                  <Typography variant="h6">Security Recommendations</Typography>
+                  <CheckCircleIcon sx={{ mr: 2, color: colors.hackerGreen }} />
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      background: `linear-gradient(90deg, ${colors.matrixGreen}, ${colors.electricBlue})`,
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                    }}
+                  >
+                    Security Recommendations
+                  </Typography>
                 </Box>
                 <Grid container spacing={2}>
                   {securitySuggestions.map((suggestion) => (
@@ -706,13 +964,17 @@ const SecurityDashboard = () => {
                         sx={{
                           border: "1px solid",
                           borderColor: suggestion.completed
-                            ? "success.main"
-                            : "primary.main",
+                            ? colors.matrixGreen
+                            : colors.electricBlue,
                           borderRadius: 2,
                           p: 2,
                           height: "100%",
                           display: "flex",
                           flexDirection: "column",
+                          background: `${colors.deepSpace}`,
+                          boxShadow: suggestion.completed
+                            ? `0 0 10px ${colors.matrixGreen}40`
+                            : `0 0 10px ${colors.electricBlue}40`,
                         }}
                       >
                         <Typography
@@ -721,8 +983,8 @@ const SecurityDashboard = () => {
                             fontWeight: 600,
                             mb: 1,
                             color: suggestion.completed
-                              ? "success.main"
-                              : "primary.main",
+                              ? colors.matrixGreen
+                              : colors.electricBlue,
                           }}
                         >
                           {suggestion.title}
@@ -731,7 +993,7 @@ const SecurityDashboard = () => {
                           variant="body2"
                           sx={{
                             flexGrow: 1,
-                            color: "text.secondary",
+                            color: colors.starlight,
                           }}
                         >
                           {suggestion.description}
@@ -746,11 +1008,13 @@ const SecurityDashboard = () => {
                           }}
                         >
                           {suggestion.completed ? (
-                            <CheckCircleIcon sx={{ color: "success.main" }} />
+                            <CheckCircleIcon
+                              sx={{ color: colors.matrixGreen }}
+                            />
                           ) : (
                             <Typography
                               variant="body2"
-                              sx={{ color: "primary.main" }}
+                              sx={{ color: colors.electricBlue }}
                             >
                               Action Required
                             </Typography>
@@ -758,7 +1022,22 @@ const SecurityDashboard = () => {
                           <Button
                             variant="outlined"
                             size="small"
-                            color={suggestion.completed ? "primary" : "success"}
+                            sx={{
+                              borderColor: suggestion.completed
+                                ? colors.matrixGreen
+                                : colors.electricBlue,
+                              color: suggestion.completed
+                                ? colors.matrixGreen
+                                : colors.electricBlue,
+                              "&:hover": {
+                                backgroundColor: suggestion.completed
+                                  ? `${colors.matrixGreen}20`
+                                  : `${colors.electricBlue}20`,
+                                borderColor: suggestion.completed
+                                  ? colors.matrixGreen
+                                  : colors.electricBlue,
+                              },
+                            }}
                             onClick={() =>
                               toggleSuggestionCompletion(suggestion.id)
                             }
@@ -776,7 +1055,14 @@ const SecurityDashboard = () => {
 
           {/* Real-Time Threat Alerts */}
           <Grid item xs={12}>
-            <Card sx={{ backgroundColor: "background.paper" }}>
+            <Card
+              sx={{
+                background: `linear-gradient(135deg, ${colors.deepSpace}, ${colors.nebulaBlue})`,
+                boxShadow: `0 0 15px ${colors.matrixGreen}30, 0 0 30px ${colors.electricBlue}15`,
+                border: `1px solid ${colors.matrixGreen}30`,
+                borderRadius: "16px",
+              }}
+            >
               <CardContent>
                 <Box>
                   <Typography
@@ -785,16 +1071,23 @@ const SecurityDashboard = () => {
                       mb: 2,
                       display: "flex",
                       alignItems: "center",
-                      color: "secondary.main",
+                      background: `linear-gradient(90deg, ${colors.matrixGreen}, ${colors.electricBlue})`,
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
                     }}
                   >
-                    <ThreatIcon sx={{ mr: 2 }} /> Real-Time Threat Alerts
+                    <ThreatIcon sx={{ mr: 2, color: colors.hackerGreen }} />{" "}
+                    Real-Time Threat Alerts
                     {!emailConnected && (
                       <Chip
                         label="Demo Data"
-                        color="primary"
                         size="small"
-                        sx={{ ml: 2 }}
+                        sx={{
+                          ml: 2,
+                          backgroundColor: `${colors.electricBlue}30`,
+                          color: colors.electricBlue,
+                          border: `1px solid ${colors.electricBlue}60`,
+                        }}
                       />
                     )}
                   </Typography>
@@ -813,25 +1106,35 @@ const SecurityDashboard = () => {
                           value={scanProgress}
                           text={`${scanProgress}%`}
                           styles={buildStyles({
-                            textColor: "white",
-                            pathColor: "#3f7afc",
+                            textColor: colors.starlight,
+                            pathColor: colors.hackerGreen,
                             trailColor: "rgba(255,255,255,0.1)",
                             textSize: "24px",
                           })}
                         />
                       </Box>
-                      <Typography variant="h6">
+                      <Typography variant="h6" sx={{ color: colors.starlight }}>
                         Security Scan in Progress
                       </Typography>
-                      <Typography variant="body2" color="text.secondary">
+                      <Typography
+                        variant="body2"
+                        sx={{ color: colors.cosmicDust }}
+                      >
                         Analyzing system for potential threats...
                       </Typography>
                       <Button
                         variant="contained"
-                        color="primary"
                         startIcon={<ScanIcon />}
                         onClick={startSecurityScan}
-                        sx={{ mt: 2 }}
+                        sx={{
+                          mt: 2,
+                          background: `linear-gradient(90deg, ${colors.matrixGreen}, ${colors.electricBlue})`,
+                          color: colors.deepSpace,
+                          fontWeight: "bold",
+                          "&:hover": {
+                            boxShadow: `0 0 15px ${colors.matrixGreen}`,
+                          },
+                        }}
                       >
                         {isScanning ? "Scanning..." : "Scan for Threats"}
                       </Button>
@@ -851,27 +1154,39 @@ const SecurityDashboard = () => {
                           <CheckCircleIcon
                             sx={{
                               fontSize: 80,
-                              color: "success.main",
+                              color: colors.hackerGreen,
                               mb: 2,
                             }}
                           />
-                          <Typography variant="h6" sx={{ mb: 1 }}>
+                          <Typography
+                            variant="h6"
+                            sx={{ mb: 1, color: colors.starlight }}
+                          >
                             No Active Threats Detected
                           </Typography>
                           <Typography
                             variant="body2"
-                            color="text.secondary"
-                            sx={{ textAlign: "center" }}
+                            sx={{
+                              textAlign: "center",
+                              color: colors.cosmicDust,
+                            }}
                           >
                             Your system is secure and no immediate threats have
                             been identified.
                           </Typography>
                           <Button
                             variant="contained"
-                            color="primary"
                             startIcon={<ScanIcon />}
                             onClick={startSecurityScan}
-                            sx={{ mt: 2 }}
+                            sx={{
+                              mt: 2,
+                              background: `linear-gradient(90deg, ${colors.matrixGreen}, ${colors.electricBlue})`,
+                              color: colors.deepSpace,
+                              fontWeight: "bold",
+                              "&:hover": {
+                                boxShadow: `0 0 15px ${colors.matrixGreen}`,
+                              },
+                            }}
                           >
                             Perform Security Scan
                           </Button>
@@ -896,11 +1211,13 @@ const SecurityDashboard = () => {
                             <Box
                               key={threat.id}
                               sx={{
-                                backgroundColor: "background.paper",
+                                backgroundColor: `${colors.cosmicPurple}`,
                                 border: `1px solid ${
-                                  theme.palette.threatColors[
-                                    threat.risk.toLowerCase()
-                                  ].main
+                                  threat.risk === "High"
+                                    ? colors.plasmaPink
+                                    : threat.risk === "Medium"
+                                    ? colors.electricBlue
+                                    : colors.matrixGreen
                                 }`,
                                 borderRadius: 2,
                                 p: 2,
@@ -908,6 +1225,13 @@ const SecurityDashboard = () => {
                                 display: "flex",
                                 justifyContent: "space-between",
                                 alignItems: "center",
+                                boxShadow: `0 0 10px ${
+                                  threat.risk === "High"
+                                    ? `${colors.plasmaPink}40`
+                                    : threat.risk === "Medium"
+                                    ? `${colors.electricBlue}40`
+                                    : `${colors.matrixGreen}40`
+                                }`,
                               }}
                             >
                               <Box>
@@ -917,9 +1241,11 @@ const SecurityDashboard = () => {
                                     fontWeight: 600,
                                     mb: 1,
                                     color:
-                                      theme.palette.threatColors[
-                                        threat.risk.toLowerCase()
-                                      ].main,
+                                      threat.risk === "High"
+                                        ? colors.plasmaPink
+                                        : threat.risk === "Medium"
+                                        ? colors.electricBlue
+                                        : colors.matrixGreen,
                                   }}
                                 >
                                   {threat.description}
@@ -933,8 +1259,28 @@ const SecurityDashboard = () => {
                                 >
                                   <Chip
                                     label={`${threat.risk} Risk`}
-                                    color={getRiskColor(threat.risk)}
                                     size="small"
+                                    sx={{
+                                      backgroundColor:
+                                        threat.risk === "High"
+                                          ? `${colors.plasmaPink}30`
+                                          : threat.risk === "Medium"
+                                          ? `${colors.electricBlue}30`
+                                          : `${colors.matrixGreen}30`,
+                                      color:
+                                        threat.risk === "High"
+                                          ? colors.plasmaPink
+                                          : threat.risk === "Medium"
+                                          ? colors.electricBlue
+                                          : colors.matrixGreen,
+                                      border: `1px solid ${
+                                        threat.risk === "High"
+                                          ? `${colors.plasmaPink}60`
+                                          : threat.risk === "Medium"
+                                          ? `${colors.electricBlue}60`
+                                          : `${colors.matrixGreen}60`
+                                      }`,
+                                    }}
                                   />
                                   <Chip
                                     label={
@@ -942,31 +1288,43 @@ const SecurityDashboard = () => {
                                         ? "Phishing Email"
                                         : threat.type
                                     }
-                                    color="primary"
                                     size="small"
+                                    sx={{
+                                      backgroundColor: `${colors.electricBlue}30`,
+                                      color: colors.electricBlue,
+                                      border: `1px solid ${colors.electricBlue}60`,
+                                    }}
                                   />
                                   {threat.probability && (
                                     <Chip
                                       label={`${(
                                         threat.probability * 100
                                       ).toFixed(0)}% Confidence`}
-                                      color="secondary"
                                       size="small"
+                                      sx={{
+                                        backgroundColor: `${colors.matrixGreen}30`,
+                                        color: colors.matrixGreen,
+                                        border: `1px solid ${colors.matrixGreen}60`,
+                                      }}
                                     />
                                   )}
                                   {!emailConnected && (
                                     <Chip
                                       label="Demo Data"
-                                      color="primary"
                                       variant="outlined"
                                       size="small"
+                                      sx={{
+                                        backgroundColor: "transparent",
+                                        color: colors.cosmicDust,
+                                        border: `1px solid ${colors.cosmicDust}`,
+                                      }}
                                     />
                                   )}
                                 </Box>
                                 {threat.sender && (
                                   <Typography
                                     variant="body2"
-                                    sx={{ mt: 1, color: "text.secondary" }}
+                                    sx={{ mt: 1, color: colors.cosmicDust }}
                                   >
                                     From: {threat.sender}
                                   </Typography>
@@ -974,7 +1332,7 @@ const SecurityDashboard = () => {
                                 {threat.subject && (
                                   <Typography
                                     variant="body2"
-                                    sx={{ color: "text.secondary" }}
+                                    sx={{ color: colors.cosmicDust }}
                                   >
                                     Subject: {threat.subject}
                                   </Typography>
@@ -983,17 +1341,31 @@ const SecurityDashboard = () => {
                               <Box>
                                 <Button
                                   variant="outlined"
-                                  color="primary"
                                   size="small"
-                                  sx={{ mr: 1 }}
+                                  sx={{
+                                    mr: 1,
+                                    borderColor: colors.electricBlue,
+                                    color: colors.electricBlue,
+                                    "&:hover": {
+                                      backgroundColor: `${colors.electricBlue}20`,
+                                      borderColor: colors.electricBlue,
+                                    },
+                                  }}
                                   onClick={() => handleMarkAsSafe(threat.id)}
                                 >
                                   Mark as Safe
                                 </Button>
                                 <Button
                                   variant="contained"
-                                  color="secondary"
                                   size="small"
+                                  sx={{
+                                    background: `linear-gradient(90deg, ${colors.electricBlue}, ${colors.plasmaPink})`,
+                                    color: colors.deepSpace,
+                                    fontWeight: "bold",
+                                    "&:hover": {
+                                      boxShadow: `0 0 10px ${colors.electricBlue}`,
+                                    },
+                                  }}
                                   onClick={() => handleReportThreat(threat)}
                                 >
                                   Report
@@ -1011,7 +1383,14 @@ const SecurityDashboard = () => {
           </Grid>
 
           <Grid item xs={12}>
-            <Card sx={{ backgroundColor: "background.paper" }}>
+            <Card
+              sx={{
+                background: `linear-gradient(135deg, ${colors.deepSpace}, ${colors.nebulaBlue})`,
+                boxShadow: `0 0 15px ${colors.matrixGreen}30, 0 0 30px ${colors.electricBlue}15`,
+                border: `1px solid ${colors.matrixGreen}30`,
+                borderRadius: "16px",
+              }}
+            >
               <CardContent>
                 <Box
                   sx={{
@@ -1022,8 +1401,15 @@ const SecurityDashboard = () => {
                   }}
                 >
                   <Box sx={{ display: "flex", alignItems: "center" }}>
-                    <HistoryIcon sx={{ mr: 2, color: "primary.main" }} />
-                    <Typography variant="h6">
+                    <HistoryIcon sx={{ mr: 2, color: colors.hackerGreen }} />
+                    <Typography
+                      variant="h6"
+                      sx={{
+                        background: `linear-gradient(90deg, ${colors.matrixGreen}, ${colors.electricBlue})`,
+                        WebkitBackgroundClip: "text",
+                        WebkitTextFillColor: "transparent",
+                      }}
+                    >
                       Threat Resolution History
                     </Typography>
                   </Box>
@@ -1031,51 +1417,87 @@ const SecurityDashboard = () => {
                 <TableContainer
                   component={Paper}
                   sx={{
-                    backgroundColor: "background.default",
+                    backgroundColor: colors.deepSpace,
                     boxShadow: "none",
-                    border: "1px solid rgba(255,255,255,0.12)",
+                    border: `1px solid ${colors.matrixGreen}30`,
+                    borderRadius: "8px",
+                    overflow: "hidden",
                   }}
                 >
                   <Table sx={{ minWidth: 650 }}>
                     <TableHead>
-                      <TableRow>
+                      <TableRow
+                        sx={{ backgroundColor: `${colors.cosmicPurple}` }}
+                      >
                         <TableCell
-                          sx={{ color: "text.primary", fontWeight: "bold" }}
+                          sx={{
+                            color: colors.electricBlue,
+                            fontWeight: "bold",
+                            borderBottom: `1px solid ${colors.electricBlue}40`,
+                          }}
                         >
                           S.No
                         </TableCell>
                         <TableCell
-                          sx={{ color: "text.primary", fontWeight: "bold" }}
+                          sx={{
+                            color: colors.electricBlue,
+                            fontWeight: "bold",
+                            borderBottom: `1px solid ${colors.electricBlue}40`,
+                          }}
                         >
                           Date
                         </TableCell>
                         <TableCell
-                          sx={{ color: "text.primary", fontWeight: "bold" }}
+                          sx={{
+                            color: colors.electricBlue,
+                            fontWeight: "bold",
+                            borderBottom: `1px solid ${colors.electricBlue}40`,
+                          }}
                         >
                           Threat Type
                         </TableCell>
                         <TableCell
-                          sx={{ color: "text.primary", fontWeight: "bold" }}
+                          sx={{
+                            color: colors.electricBlue,
+                            fontWeight: "bold",
+                            borderBottom: `1px solid ${colors.electricBlue}40`,
+                          }}
                         >
                           Description
                         </TableCell>
                         <TableCell
-                          sx={{ color: "text.primary", fontWeight: "bold" }}
+                          sx={{
+                            color: colors.electricBlue,
+                            fontWeight: "bold",
+                            borderBottom: `1px solid ${colors.electricBlue}40`,
+                          }}
                         >
                           Risk
                         </TableCell>
                         <TableCell
-                          sx={{ color: "text.primary", fontWeight: "bold" }}
+                          sx={{
+                            color: colors.electricBlue,
+                            fontWeight: "bold",
+                            borderBottom: `1px solid ${colors.electricBlue}40`,
+                          }}
                         >
                           Action Taken
                         </TableCell>
                         <TableCell
-                          sx={{ color: "text.primary", fontWeight: "bold" }}
+                          sx={{
+                            color: colors.electricBlue,
+                            fontWeight: "bold",
+                            borderBottom: `1px solid ${colors.electricBlue}40`,
+                          }}
                         >
                           Resolved By
                         </TableCell>
                         <TableCell
-                          sx={{ color: "text.primary", fontWeight: "bold" }}
+                          sx={{
+                            color: colors.electricBlue,
+                            fontWeight: "bold",
+                            borderBottom: `1px solid ${colors.electricBlue}40`,
+                          }}
                         >
                           Actions
                         </TableCell>
@@ -1087,41 +1509,98 @@ const SecurityDashboard = () => {
                           key={threat.id}
                           sx={{
                             "&:last-child td, &:last-child th": { border: 0 },
-                            backgroundColor: theme.palette.background.paper,
+                            backgroundColor: colors.nebulaBlue,
+                            borderBottom: `1px solid ${colors.electricBlue}20`,
                             "&:hover": {
-                              backgroundColor: "rgba(255,255,255,0.08)",
+                              backgroundColor: `${colors.cosmicPurple}90`,
+                              boxShadow: `inset 0 0 8px ${colors.electricBlue}40`,
                             },
                           }}
                         >
-                          <TableCell sx={{ color: "text.secondary" }}>
+                          <TableCell
+                            sx={{
+                              color: colors.starlight,
+                              borderBottom: "none",
+                            }}
+                          >
                             {index + 1}
                           </TableCell>
-                          <TableCell sx={{ color: "text.secondary" }}>
+                          <TableCell
+                            sx={{
+                              color: colors.starlight,
+                              borderBottom: "none",
+                            }}
+                          >
                             {threat.date}
                           </TableCell>
-                          <TableCell sx={{ color: "text.secondary" }}>
+                          <TableCell
+                            sx={{
+                              color: colors.starlight,
+                              borderBottom: "none",
+                            }}
+                          >
                             {threat.type}
                           </TableCell>
-                          <TableCell sx={{ color: "text.secondary" }}>
+                          <TableCell
+                            sx={{
+                              color: colors.starlight,
+                              borderBottom: "none",
+                            }}
+                          >
                             {threat.description}
                           </TableCell>
-                          <TableCell>
+                          <TableCell sx={{ borderBottom: "none" }}>
                             <Chip
                               label={`${threat.risk} Risk`}
-                              color={getRiskColor(threat.risk).split(".")[1]}
                               size="small"
+                              sx={{
+                                backgroundColor:
+                                  threat.risk === "High"
+                                    ? `${colors.plasmaPink}30`
+                                    : threat.risk === "Medium"
+                                    ? `${colors.electricBlue}30`
+                                    : `${colors.matrixGreen}30`,
+                                color:
+                                  threat.risk === "High"
+                                    ? colors.plasmaPink
+                                    : threat.risk === "Medium"
+                                    ? colors.electricBlue
+                                    : colors.matrixGreen,
+                                border: `1px solid ${
+                                  threat.risk === "High"
+                                    ? `${colors.plasmaPink}60`
+                                    : threat.risk === "Medium"
+                                    ? `${colors.electricBlue}60`
+                                    : `${colors.matrixGreen}60`
+                                }`,
+                              }}
                             />
                           </TableCell>
-                          <TableCell sx={{ color: "text.secondary" }}>
+                          <TableCell
+                            sx={{
+                              color: colors.starlight,
+                              borderBottom: "none",
+                            }}
+                          >
                             {threat.action}
                           </TableCell>
-                          <TableCell sx={{ color: "text.secondary" }}>
+                          <TableCell
+                            sx={{
+                              color: colors.starlight,
+                              borderBottom: "none",
+                            }}
+                          >
                             {threat.resolvedBy}
                           </TableCell>
-                          <TableCell>
+                          <TableCell sx={{ borderBottom: "none" }}>
                             <IconButton
-                              color="secondary"
                               size="small"
+                              sx={{
+                                color: colors.plasmaPink,
+                                "&:hover": {
+                                  backgroundColor: `${colors.plasmaPink}20`,
+                                },
+                              }}
                               onClick={() => removeThreatFromHistory(threat.id)}
                             >
                               <DeleteIcon />
@@ -1134,8 +1613,8 @@ const SecurityDashboard = () => {
                 </TableContainer>
               </CardContent>
             </Card>
+            <FirewallRules threats={actualThreats} />
           </Grid>
-          <FirewallRules threats={actualThreats} />
         </Grid>
       </Box>
       <EmailAuthModal

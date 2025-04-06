@@ -1,0 +1,2 @@
+from preprocess import train_generator
+print(train_generator.class_indices)
