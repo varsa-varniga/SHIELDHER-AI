@@ -133,10 +133,10 @@ const CyberMenuButton = styled(IconButton)({
 });
 
 const CyberLogo = styled('img')({
-  filter: 'drop-shadow(0 0 5px rgba(0, 255, 157, 0.7))',
+  filter: 'drop-shadow(0 0 4px rgba(0, 255, 157, 0.7))',
   transition: 'all 0.3s ease',
   '&:hover': {
-    filter: 'drop-shadow(0 0 10px rgba(0, 255, 157, 1))'
+    filter: 'drop-shadow(0 0 7px rgba(0, 255, 157, 1))'
   }
 });
 
@@ -189,9 +189,10 @@ const CybersecuritySidebar = ({ isExpanded, setIsExpanded }) => {
           alignItems: 'center', 
           justifyContent: 'space-between', 
           p: 2,
-          borderBottom: `1px solid ${colors.matrixGreen}20`
+          borderBottom: `1px solid ${colors.matrixGreen}20`,
+          minHeight: 64
         }}>
-          {isExpanded && (
+          {isExpanded ? (
             <CyberLogo
               src={logo}
               alt="logo"
@@ -199,10 +200,13 @@ const CybersecuritySidebar = ({ isExpanded, setIsExpanded }) => {
               width={180}
               height={45}
             />
+          ) : (
+            <Box sx={{ width: 40 }} /> // Spacer to balance the menu button
           )}
           <CyberMenuButton 
             onClick={() => setIsExpanded(!isExpanded)}
             size="large"
+            sx={{ ml: isExpanded ? 0 : 'auto' }}
           >
             <MenuIcon sx={{ fontSize: "32px" }} />
           </CyberMenuButton>
@@ -222,12 +226,23 @@ const CybersecuritySidebar = ({ isExpanded, setIsExpanded }) => {
                 selected={location.pathname === item.route}
                 onClick={() => navigate(item.route)}
                 sx={{
-                  justifyContent: isExpanded ? 'initial' : 'center',
-                  px: isExpanded ? 3 : 2,
-                  py: 1.5
+                  justifyContent: 'center',
+                  px: 2.5,
+                  py: 1.5,
+                  ...(isExpanded && {
+                    justifyContent: 'initial',
+                    px: 3
+                  })
                 }}
               >
-                <ListItemIcon>
+                <ListItemIcon sx={{ 
+                  justifyContent: 'center',
+                  minWidth: 'auto',
+                  ...(isExpanded && { 
+                    justifyContent: 'flex-start',
+                    minWidth: 36 
+                  })
+                }}>
                   {item.icon}
                 </ListItemIcon>
                 {isExpanded && (
@@ -236,6 +251,7 @@ const CybersecuritySidebar = ({ isExpanded, setIsExpanded }) => {
                     primaryTypographyProps={{
                       fontSize: '0.9rem'
                     }}
+                    sx={{ ml: 1 }}
                   />
                 )}
               </CyberListItemButton>
@@ -253,16 +269,27 @@ const CybersecuritySidebar = ({ isExpanded, setIsExpanded }) => {
           <CyberListItemButton
             onClick={handleLogout}
             sx={{
-              justifyContent: isExpanded ? 'initial' : 'center',
-              px: isExpanded ? 3 : 2.5,
+              justifyContent: 'center',
+              px: 2.5,
               py: 1.5,
-              mb: 2
+              mb: 2,
+              ...(isExpanded && {
+                justifyContent: 'initial',
+                px: 3
+              })
             }}
           >
-            <ListItemIcon>
+            <ListItemIcon sx={{ 
+              justifyContent: 'center',
+              minWidth: 'auto',
+              ...(isExpanded && { 
+                justifyContent: 'flex-start',
+                minWidth: 36 
+              })
+            }}>
               <LogoutIcon />
             </ListItemIcon>
-            {isExpanded && <ListItemText primary="Logout" />}
+            {isExpanded && <ListItemText primary="Logout" sx={{ ml: 1 }} />}
           </CyberListItemButton>
         </ListItem>
 
@@ -276,9 +303,21 @@ const CybersecuritySidebar = ({ isExpanded, setIsExpanded }) => {
           background: `linear-gradient(135deg, ${colors.deepSpace} 0%, ${colors.cosmicPurple}30 100%)`,
           '&:hover': {
             boxShadow: `0 0 15px ${colors.matrixGreen}30`
-          }
+          },
+          justifyContent: 'center',
+          ...(isExpanded && {
+            justifyContent: 'initial'
+          })
         }}>
-          <ListItemIcon>
+          <ListItemIcon sx={{ 
+            display: 'flex',
+            justifyContent: 'center',
+            minWidth: 'auto',
+            ...(isExpanded && { 
+              justifyContent: 'flex-start',
+              minWidth: 40 
+            })
+          }}>
             {picture ? (
               <CyberAvatar src={picture} alt={name} sx={{ width: 40, height: 40 }} />
             ) : (
@@ -296,7 +335,8 @@ const CybersecuritySidebar = ({ isExpanded, setIsExpanded }) => {
             <Box sx={{ 
               ml: 1, 
               overflow: "hidden",
-              textOverflow: 'ellipsis'
+              textOverflow: 'ellipsis',
+              flex: 1
             }}>
               <Typography 
                 variant="subtitle2" 
