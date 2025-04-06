@@ -1,5 +1,5 @@
 function fetchPhishingPrediction(url) {
-    fetch("http://127.0.0.1:5002/predicturl", {
+    fetch("http://localhost:5002/predicturl", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
